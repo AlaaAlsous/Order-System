@@ -145,6 +145,28 @@ namespace OrderSystem
                     JOIN order_rows ON orders.id = order_rows.order_id
                     LEFT JOIN products ON order_rows.product_id = products.id
             ";
+            using var reader = command.ExecuteReader();
+            Console.WriteLine();
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("ORDERS", Console.WindowWidth - 1), ConsoleColor.Cyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            Console.WriteLine();
+            string separator = new string('-', 152);
+            ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+            ConsoleHelper.WriteTableRow(new string[]
+            {
+                ConsoleHelper.CenterText("Order", 5),
+                ConsoleHelper.CenterText("Customer", 20),
+                ConsoleHelper.CenterText("Date", 10),
+                ConsoleHelper.CenterText("Status", 9),
+                ConsoleHelper.CenterText("Item ID", 7),
+                ConsoleHelper.CenterText("Product", 15),
+                ConsoleHelper.CenterText("Description", 25),
+                ConsoleHelper.CenterText("Quantity", 8),
+                ConsoleHelper.CenterText("Unit Price", 10),
+                ConsoleHelper.CenterText("Total Price", 12)
+            }, ConsoleColor.Cyan, ConsoleColor.DarkGray);
+            ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
         }
     }
 }
