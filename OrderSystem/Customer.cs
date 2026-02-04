@@ -14,10 +14,10 @@ namespace OrderSystem
         {
             using var command = conn.CreateCommand();
             command.CommandText = @"
-             INSERT INTO customers (name, email, phone, address)
-             VALUES (@name, @email, @phone, @address)
-             RETURNING Id;
-         ";
+                INSERT INTO customers (name, email, phone, address)
+                VALUES (@name, @email, @phone, @address)
+                RETURNING Id;
+            ";
             command.Parameters.AddWithValue("@name", Name);
             command.Parameters.AddWithValue("@email", Email);
             command.Parameters.AddWithValue("@phone", Phone);
@@ -26,7 +26,7 @@ namespace OrderSystem
             Id = Convert.ToInt32(command.ExecuteScalar());
         }
 
-                public static void Add(SqliteConnection conn)
+        public static void Add(SqliteConnection conn)
         {
             Console.Clear();
             Console.WriteLine();
