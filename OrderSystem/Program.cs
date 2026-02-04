@@ -167,6 +167,38 @@ namespace OrderSystem
                 ConsoleHelper.CenterText("Total Price", 12)
             }, ConsoleColor.Cyan, ConsoleColor.DarkGray);
             ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+
+            while (reader.Read())
+            {
+                int orderId = reader.GetInt32(0);
+                string customerName = reader.GetString(1);
+                long orderDateUnix = reader.GetInt64(2);
+                DateTime orderDate = DateTimeOffset.FromUnixTimeSeconds(orderDateUnix).DateTime;
+                string status = reader.GetString(3);
+                int orderItemId = reader.GetInt32(4);
+                string productName = reader.IsDBNull(5) ? "" : reader.GetString(5);
+                string description = reader.IsDBNull(6) ? "" : reader.GetString(6);
+                int quantity = reader.GetInt32(7);
+                decimal unitPrice = reader.GetDecimal(8);
+                decimal totalPrice = reader.GetDecimal(9);
+
+                ConsoleHelper.WriteTableRow(new string[]
+                {
+                    ConsoleHelper.CenterText(orderId.ToString(), 5),
+                    ConsoleHelper.CenterText(customerName, 20),
+                    ConsoleHelper.CenterText(orderDate.ToString("yyyy-MM-dd"), 10),
+                    ConsoleHelper.CenterText(status, 9),
+                    ConsoleHelper.CenterText(orderItemId.ToString(), 7),
+                    ConsoleHelper.CenterText(productName, 15),
+                    ConsoleHelper.CenterText(description, 25),
+                    ConsoleHelper.CenterText(quantity.ToString(), 8),
+                    ConsoleHelper.CenterText(unitPrice.ToString("F2") + " kr", 10),
+                    ConsoleHelper.CenterText(totalPrice.ToString("F2") + " kr", 12)
+                }, ConsoleColor.White, ConsoleColor.DarkGray);
+                ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+            }
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey();
         }
     }
 }
