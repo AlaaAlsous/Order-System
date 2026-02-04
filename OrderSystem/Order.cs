@@ -52,7 +52,24 @@ namespace OrderSystem
                 order.CustomerId = customerId;
                 break;
             }
-            Console.WriteLine($"Order Date and Time: {order.OrderDate:yyyy-MM-dd HH:mm:ss}");
+            while (true)
+            {
+                Console.Write("Order Date and Time (YYYY-MM-DD) [Leave empty for current UTC time]: ");
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
+                if (string.IsNullOrEmpty(input))
+                {
+                    order.OrderDate = DateTime.UtcNow;
+                    break;
+                }
+                else if (DateTime.TryParseExact(input, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.AssumeUniversal, out DateTime orderDate))
+                {
+                    order.OrderDate = orderDate.ToUniversalTime();
+                    break;
+                }
+                ConsoleHelper.TextColor("⚠️ Invalid date format. Please use 'YYYY-MM-DD'.", ConsoleColor.Red);
+            }
             Console.WriteLine($"Status: {order.Status}");
 
             order.Save(conn);
