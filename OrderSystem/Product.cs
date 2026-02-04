@@ -22,5 +22,20 @@ namespace OrderSystem
 
             Id = Convert.ToInt32(command.ExecuteScalar());
         }
+        public static void Add(SqliteConnection conn)
+        {
+            Console.WriteLine("--- Create Product ---");
+            Product product = new Product();
+
+            Console.Write("Name: "); product.Name = Console.ReadLine() ?? "";
+            Console.Write("Unit Price: "); product.UnitPrice = double.Parse(Console.ReadLine() ?? "0");
+            Console.Write("Stock: "); product.Stock = int.Parse(Console.ReadLine() ?? "0");
+
+            product.Save(conn);
+
+            Console.WriteLine($"Product '{product.Name}' created successfully with ID: {product.Id}");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
     }
 }
