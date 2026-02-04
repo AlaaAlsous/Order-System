@@ -40,21 +40,24 @@ namespace OrderSystem
             while (true)
             {
                 Console.Write("Name: ");
-                var input = Console.ReadLine()?.Trim() ?? "";
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
                 if (input.Length >= 3 && input.Length <= 20)
                 {
                     customer.Name = input; break;
                 }
-                ConsoleHelper.TextColor("⚠️ Name cannot be empty. You must provide a valid name (between 3 and 20 characters).\n", ConsoleColor.Red
-            );
+                ConsoleHelper.TextColor("⚠️ Name cannot be empty. And you must provide a valid name (between 3 and 20 characters).\n", ConsoleColor.Red);
             }
             while (true)
             {
                 Console.Write("Email: ");
-                var input = Console.ReadLine()?.Trim() ?? "";
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
                 if (string.IsNullOrWhiteSpace(input) || !input.Contains("@") || !input.Contains("."))
                 {
-                    ConsoleHelper.TextColor("⚠️ Email cannot be empty. You must provide a valid email.", ConsoleColor.Red);
+                    ConsoleHelper.TextColor("⚠️ Email cannot be empty. And you must provide a valid email.", ConsoleColor.Red);
                     continue;
                 }
                 if (EmailExists(conn, input))
@@ -68,22 +71,26 @@ namespace OrderSystem
             while (true)
             {
                 Console.Write("Phone: ");
-                var input = Console.ReadLine()?.Trim() ?? "";
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
                 if (!string.IsNullOrWhiteSpace(input) && input.Length >= 5 && input.Length <= 15 && long.TryParse(input, out _))
                 {
                     customer.Phone = input; break;
                 }
-                ConsoleHelper.TextColor("⚠️ Phone cannot be empty. You must provide a valid phone number.", ConsoleColor.Red);
+                ConsoleHelper.TextColor("⚠️ Phone cannot be empty. And you must provide a valid phone number.", ConsoleColor.Red);
             }
             while (true)
             {
                 Console.Write("Address: ");
-                var input = Console.ReadLine()?.Trim() ?? "";
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
                 if (!string.IsNullOrWhiteSpace(input) && input.Length >= 5 && input.Length <= 100)
                 {
                     customer.Address = input; break;
                 }
-                ConsoleHelper.TextColor("⚠️ Address cannot be empty. You must provide a valid address.", ConsoleColor.Red);
+                ConsoleHelper.TextColor("⚠️ Address cannot be empty. And you must provide a valid address.", ConsoleColor.Red);
             }
 
             customer.Save(conn);
@@ -104,4 +111,3 @@ namespace OrderSystem
         }
     }
 }
-
