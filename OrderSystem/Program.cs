@@ -92,6 +92,21 @@ namespace OrderSystem
                         ConsoleHelper.TextColor(ConsoleHelper.CenterText($"  {menu[i],-15}  ", Console.WindowWidth - 1), ConsoleColor.DarkGray);
                     }
                 }
+                var Key = Console.ReadKey(true).Key;
+                if (Key == ConsoleKey.DownArrow)
+                {
+                    position++;
+                    if (position == menu.Length) position = 0;
+                }
+                else if (Key == ConsoleKey.UpArrow)
+                {
+                    position--;
+                    if (position < 0) position = menu.Length - 1;
+                }
+                else if (Key == ConsoleKey.Enter)
+                {
+                    Console.Clear();
+                }
             }
         }
     }
