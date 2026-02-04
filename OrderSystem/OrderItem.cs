@@ -27,5 +27,23 @@ namespace OrderSystem
 
             Id = Convert.ToInt32(command.ExecuteScalar());
         }
+
+        public static void Add(SqliteConnection conn)
+        {
+            Console.WriteLine("--- Add Order Item ---");
+            OrderItem orderItem = new OrderItem();
+
+            Console.Write("Order ID: "); orderItem.OrderId = int.Parse(Console.ReadLine() ?? "0");
+            Console.Write("Product ID: "); orderItem.ProductId = int.Parse(Console.ReadLine() ?? "0");
+            Console.Write("Description: "); orderItem.Description = Console.ReadLine() ?? "";
+            Console.Write("Quantity: "); orderItem.Quantity = int.Parse(Console.ReadLine() ?? "0");
+            Console.Write("Price: "); orderItem.Price = decimal.Parse(Console.ReadLine() ?? "0");
+
+            orderItem.Save(conn);
+
+            Console.WriteLine($"Order item '{orderItem.Id}' added successfully with ID: {orderItem.Id}.");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
     }
 }
