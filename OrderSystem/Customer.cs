@@ -58,6 +58,33 @@ namespace OrderSystem
                 }
                 ConsoleHelper.TextColor("⚠️ Email cannot be empty. You must provide a valid email.", ConsoleColor.Red);
             }
+            while (true)
+            {
+                Console.Write("Phone: ");
+                var input = Console.ReadLine()?.Trim() ?? "";
+                if (!string.IsNullOrWhiteSpace(input) && input.Length >= 5 && input.Length <= 15 && long.TryParse(input, out _))
+                {
+                    customer.Phone = input; break;
+                }
+                ConsoleHelper.TextColor("⚠️ Phone cannot be empty. You must provide a valid phone number.", ConsoleColor.Red);
+            }
+            while (true)
+            {
+                Console.Write("Address: ");
+                var input = Console.ReadLine()?.Trim() ?? "";
+                if (!string.IsNullOrWhiteSpace(input) && input.Length >= 5 && input.Length <= 100)
+                {
+                    customer.Address = input; break;
+                }
+                ConsoleHelper.TextColor("⚠️ Address cannot be empty. You must provide a valid address.", ConsoleColor.Red);
+            }
+
+            customer.Save(conn);
+
+            Console.WriteLine();
+            ConsoleHelper.TextColor($"✅ Customer '{customer.Name}' created successfully with ID: {customer.Id}\n", ConsoleColor.DarkGreen);
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
     }
 }

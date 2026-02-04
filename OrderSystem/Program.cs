@@ -6,6 +6,7 @@ namespace OrderSystem
     {
         static void Main(string[] args)
         {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
             using var connection = new SqliteConnection("Data Source = order_system.sqlite");
             connection.Open();
 
