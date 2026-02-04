@@ -40,12 +40,13 @@ namespace OrderSystem
             command.CommandText = @"
                 Create TABLE IF NOT EXISTS orders (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                customer_id INTEGER NOT NULL,
-                order_date INTEGER NOT NULL,
-                status TEXT NOT NULL CHECK(status IN('Created','Paid','Delivered')),
-                FOREIGN KEY (customer_id) REFERENCES customers(id)
+	            customer_id INTEGER NOT NULL,
+	            order_date INTEGER NOT NULL,
+	            status TEXT NOT NULL CHECK(status IN('Created','Paid','Delivered')),
+	            FOREIGN KEY (customer_id) REFERENCES customers(id)
                 );
-            "; command.ExecuteNonQuery();
+            ";
+            command.ExecuteNonQuery();
 
             command.CommandText = @"
                 Create TABLE IF NOT EXISTS order_rows (
@@ -63,13 +64,13 @@ namespace OrderSystem
             command.ExecuteNonQuery();
 
             string[] menu = {
-                ConsoleHelper.CenterText("Create Customer", 15),
-                ConsoleHelper.CenterText("Create Product", 15),
-                ConsoleHelper.CenterText("Create Order", 15),
-                ConsoleHelper.CenterText("Add Order Item", 15),
-                ConsoleHelper.CenterText("Show Orders", 15),
-                ConsoleHelper.CenterText("Exit", 15)
-            };
+            ConsoleHelper.CenterText("Create Customer", 15),
+            ConsoleHelper.CenterText("Create Product", 15),
+            ConsoleHelper.CenterText("Create Order", 15),
+            ConsoleHelper.CenterText("Add Order Item", 15),
+            ConsoleHelper.CenterText("Show Orders", 15),
+            ConsoleHelper.CenterText("Exit", 15)
+             };
             int position = 0;
 
             while (true)
@@ -113,7 +114,7 @@ namespace OrderSystem
                         case 1: Product.Add(connection); break;
                         case 2: Order.Add(connection); break;
                         case 3: OrderItem.Add(connection); break;
-                        case 4: //ShowOrders(connection); break;
+                        case 4: ShowOrders(connection); break;
                         case 5:
                             Console.WriteLine();
                             Console.WriteLine(ConsoleHelper.CenterText("Thank you for using Order System App!\n", 152));
@@ -123,6 +124,27 @@ namespace OrderSystem
                     }
                 }
             }
+        }
+        public static void ShowOrders(SqliteConnection conn)
+        {
+            using var command = conn.CreateCommand();
+            command.CommandText = @"
+               SELECT 
+	                orders.id AS 'Order ID',
+	                customers.name AS 'Customer',
+	                orders.order_date AS 'Order Date',
+	                orders.status AS 'Status',
+	                order_rows.id AS 'Order Item ID',
+	                products.name AS 'Product Name',
+	                order_rows.description AS 'Description',
+	                order_rows.quantity AS 'Quantity',
+	                order_rows.unit_price  AS 'Unit Price',
+	                (order_rows.quantity*order_rows.unit_price) AS 'Total Price'
+                FROM orders 
+                    JOIN customers ON orders.customer_id = customers.Id
+                    JOIN order_rows ON orders.id = order_rows.order_id
+                    LEFT JOIN products ON order_rows.product_id = products.id
+            ";
         }
     }
 }
