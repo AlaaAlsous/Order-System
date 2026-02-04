@@ -10,6 +10,9 @@ namespace OrderSystem
             connection.Open();
 
             var command = connection.CreateCommand();
+            command.CommandText = @"
+                PRAGMA foreign_keys = ON;
+            ";
             command.ExecuteNonQuery();
 
             command.CommandText = @"
@@ -57,6 +60,16 @@ namespace OrderSystem
                 );
             ";
             command.ExecuteNonQuery();
+
+            string[] menu = {
+                ConsoleHelper.CenterText("Create Customer", 15),
+                ConsoleHelper.CenterText("Create Product", 15),
+                ConsoleHelper.CenterText("Create Order", 15),
+                ConsoleHelper.CenterText("Add Order Item", 15),
+                ConsoleHelper.CenterText("Show Orders", 15),
+                ConsoleHelper.CenterText("Exit", 15)
+            };
+            int position = 0;
         }
     }
 }
