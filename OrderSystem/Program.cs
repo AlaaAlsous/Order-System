@@ -11,6 +11,17 @@ namespace OrderSystem
 
             var command = connection.CreateCommand();
             command.ExecuteNonQuery();
+
+            command.CommandText = @"
+                CREATE TABLE IF NOT EXISTS customers (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                email TEXT NOT NULL UNIQUE,
+                phone TEXT,
+                address TEXT
+                );
+            ";
+            command.ExecuteNonQuery();
         }
     }
 }
