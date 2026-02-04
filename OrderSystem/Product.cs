@@ -39,7 +39,7 @@ namespace OrderSystem
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
-                if (input.Length >= 2 && input.Length <= 20)
+                if (input.Length >= 2 && input.Length <= 15)
                 {
                     product.Name = input;
                     break;

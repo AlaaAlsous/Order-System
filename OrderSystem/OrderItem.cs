@@ -6,7 +6,7 @@ namespace OrderSystem
     {
         public int Id { get; set; }
         public int OrderId { get; set; }
-        public int ProductId { get; set; }
+        public int? ProductId { get; set; }
         public string Description { get; set; } = "";
         public int Quantity { get; set; }
         public decimal Price { get; set; }
@@ -20,8 +20,8 @@ namespace OrderSystem
             RETURNING Id;
             ";
             command.Parameters.AddWithValue("@order_id", OrderId);
-            command.Parameters.AddWithValue("@product_id", ProductId);
-            command.Parameters.AddWithValue("@description", Description);
+            command.Parameters.AddWithValue("@product_id", ProductId.HasValue ? (object)ProductId.Value : DBNull.Value);
+            command.Parameters.AddWithValue("@description", string.IsNullOrEmpty(Description) ? DBNull.Value : Description);
             command.Parameters.AddWithValue("@quantity", Quantity);
             command.Parameters.AddWithValue("@unit_price", Price);
 
@@ -60,13 +60,18 @@ namespace OrderSystem
             }
             while (true)
             {
-                Console.Write("Product ID: ");
+                Console.Write("Product ID [Leave empty to skip]: ");
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
+                if (string.IsNullOrEmpty(input))
+                {
+                    orderItem.ProductId = null;
+                    break;
+                }
                 if (!int.TryParse(input, out int productId))
                 {
-                    ConsoleHelper.TextColor("Invalid input. Please enter a valid integer for Product ID.", ConsoleColor.Red);
+                    ConsoleHelper.TextColor("Invalid input. Please enter a valid number for Product ID.", ConsoleColor.Red);
                     continue;
                 }
                 if (!ProductExists(conn, productId))
@@ -77,7 +82,27 @@ namespace OrderSystem
                 orderItem.ProductId = productId;
                 break;
             }
-            Console.Write("Description: "); orderItem.Description = Console.ReadLine() ?? "";
+            while (true)
+            {
+                Console.Write("Description [Leave empty to skip]: ");
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
+                if (input.Length <= 25)
+                {
+                    orderItem.Description = input;
+                    break;
+                }
+                ConsoleHelper.TextColor("Invalid input. Description cannot exceed 25 characters.", ConsoleColor.Red);
+            }
+
+            if (!orderItem.ProductId.HasValue && string.IsNullOrEmpty(orderItem.Description))
+            {
+                ConsoleHelper.TextColor("⚠️ You must provide either a Product ID or a Description (or both).", ConsoleColor.Red);
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
+                return;
+            }
             Console.Write("Quantity: "); orderItem.Quantity = int.Parse(Console.ReadLine() ?? "0");
             Console.Write("Price: "); orderItem.Price = decimal.Parse(Console.ReadLine() ?? "0");
 

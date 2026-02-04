@@ -30,7 +30,7 @@ namespace OrderSystem
             command.CommandText = @"
                 Create TABLE IF NOT EXISTS products (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL UNIQUE,
+                name TEXT NOT NULL UNIQUE CHECK(length(name)<=15),
                 unit_price REAL NOT NULL,
                 stock INTEGER NOT NULL
                 );
@@ -117,8 +117,8 @@ namespace OrderSystem
                         case 4: ShowOrders(connection); break;
                         case 5:
                             Console.WriteLine();
-                            Console.WriteLine(ConsoleHelper.CenterText("Thank you for using Order System App!\n", 152));
-                            Console.WriteLine(ConsoleHelper.CenterText("Press any key to exit...\n", 152));
+                            ConsoleHelper.TextColor(ConsoleHelper.CenterText("Thank you for choosing the Order System App!\n", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+                            ConsoleHelper.TextColor(ConsoleHelper.CenterText("Press any key to exit...\n", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
                             Console.ReadKey();
                             return;
                     }
