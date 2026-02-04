@@ -23,7 +23,14 @@ namespace OrderSystem
             command.Parameters.AddWithValue("@phone", Phone);
             command.Parameters.AddWithValue("@address", Address);
 
-            Id = Convert.ToInt32(command.ExecuteScalar());
+            try
+            {
+                Id = Convert.ToInt32(command.ExecuteScalar());
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
+            {
+                throw new InvalidOperationException("⚠️ This email already exists. Please use a different email.", ex);
+            }
         }
 
         public static void Add(SqliteConnection conn)
@@ -103,11 +110,10 @@ namespace OrderSystem
         public static bool EmailExists(SqliteConnection conn, string email)
         {
             using var command = conn.CreateCommand();
-            command.CommandText = @"SELECT COUNT(*) FROM customers WHERE email = @email;";
+            command.CommandText = @"SELECT EXISTS(SELECT 1 FROM customers WHERE email = @email);";
             command.Parameters.AddWithValue("@email", email);
 
-            var count = Convert.ToInt32(command.ExecuteScalar());
-            return count > 0;
+            return Convert.ToBoolean(command.ExecuteScalar());
         }
     }
 }
