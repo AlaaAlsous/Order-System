@@ -52,11 +52,18 @@ namespace OrderSystem
             {
                 Console.Write("Email: ");
                 var input = Console.ReadLine()?.Trim() ?? "";
-                if (!string.IsNullOrWhiteSpace(input) && input.Contains("@") && input.Contains("."))
+                if (string.IsNullOrWhiteSpace(input) || !input.Contains("@") || !input.Contains("."))
                 {
-                    customer.Email = input; break;
+                    ConsoleHelper.TextColor("⚠️ Email cannot be empty. You must provide a valid email.", ConsoleColor.Red);
+                    continue;
                 }
-                ConsoleHelper.TextColor("⚠️ Email cannot be empty. You must provide a valid email.", ConsoleColor.Red);
+                if (EmailExists(conn, input))
+                {
+                    ConsoleHelper.TextColor("⚠️ This email already exists. Please use a different email.", ConsoleColor.Red);
+                    continue;
+                }
+                customer.Email = input;
+                break;
             }
             while (true)
             {
@@ -85,6 +92,15 @@ namespace OrderSystem
             ConsoleHelper.TextColor($"✅ Customer '{customer.Name}' created successfully with ID: {customer.Id}\n", ConsoleColor.DarkGreen);
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
+        }
+        public static bool EmailExists(SqliteConnection conn, string email)
+        {
+            using var command = conn.CreateCommand();
+            command.CommandText = @"SELECT COUNT(*) FROM customers WHERE email = @email;";
+            command.Parameters.AddWithValue("@email", email);
+
+            var count = Convert.ToInt32(command.ExecuteScalar());
+            return count > 0;
         }
     }
 }
