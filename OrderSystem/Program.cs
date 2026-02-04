@@ -42,6 +42,21 @@ namespace OrderSystem
                 FOREIGN KEY (customer_id) REFERENCES customers(id)
                 );
             "; command.ExecuteNonQuery();
+
+            command.CommandText = @"
+                Create TABLE IF NOT EXISTS order_rows (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+	            order_id INTEGER NOT NULL,
+                product_id INTEGER,
+                description TEXT CHECK(length(description)<=25),
+	            quantity INTEGER NOT NULL,
+                unit_price REAL NOT NULL,
+	            FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+	            FOREIGN KEY (product_id) REFERENCES products(id),
+                CHECK (product_id IS NOT NULL OR description IS NOT NULL)
+                );
+            ";
+            command.ExecuteNonQuery();
         }
     }
 }
