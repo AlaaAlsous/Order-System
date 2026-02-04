@@ -23,5 +23,21 @@ namespace OrderSystem
 
             Id = Convert.ToInt32(command.ExecuteScalar());
         }
+
+        public static void Add(SqliteConnection conn)
+        {
+            Console.WriteLine("--- Add Order ---");
+            Order order = new Order();
+
+            Console.Write("Customer ID: "); order.CustomerId = int.Parse(Console.ReadLine() ?? "0");
+            Console.WriteLine($"Order Date and Time: {order.OrderDate:yyyy-MM-dd HH:mm:ss}");
+            Console.WriteLine($"Status: {order.Status}");
+
+            order.Save(conn);
+
+            Console.WriteLine($"Order '{order.Id}' added successfully with ID: {order.Id}");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
     }
 }
