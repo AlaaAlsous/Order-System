@@ -70,6 +70,29 @@ namespace OrderSystem
                 ConsoleHelper.CenterText("Exit", 15)
             };
             int position = 0;
+
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine();
+                ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+                ConsoleHelper.TextColor(ConsoleHelper.CenterText("ORDER SYSTEM", Console.WindowWidth - 1), ConsoleColor.Cyan);
+                ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+                Console.WriteLine();
+                ConsoleHelper.TextColor(ConsoleHelper.CenterText("Use arrow keys to navigate and Enter to select.\n", Console.WindowWidth - 1), ConsoleColor.Blue);
+                Console.CursorVisible = false;
+                for (int i = 0; i < menu.Length; i++)
+                {
+                    if (i == position)
+                    {
+                        ConsoleHelper.TextColor(ConsoleHelper.CenterText($">>> {menu[i],-15} <<<", Console.WindowWidth - 1), ConsoleColor.Cyan);
+                    }
+                    else
+                    {
+                        ConsoleHelper.TextColor(ConsoleHelper.CenterText($"  {menu[i],-15}  ", Console.WindowWidth - 1), ConsoleColor.DarkGray);
+                    }
+                }
+            }
         }
     }
 }
