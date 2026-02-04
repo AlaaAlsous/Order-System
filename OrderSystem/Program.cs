@@ -32,6 +32,16 @@ namespace OrderSystem
                 );
             ";
             command.ExecuteNonQuery();
+
+            command.CommandText = @"
+                Create TABLE IF NOT EXISTS orders (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                customer_id INTEGER NOT NULL,
+                order_date INTEGER NOT NULL,
+                status TEXT NOT NULL CHECK(status IN('Created','Paid','Delivered')),
+                FOREIGN KEY (customer_id) REFERENCES customers(id)
+                );
+            "; command.ExecuteNonQuery();
         }
     }
 }
