@@ -62,7 +62,8 @@ namespace OrderSystem
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
-                if (string.IsNullOrWhiteSpace(input) || !input.Contains("@") || !input.Contains("."))
+                if (string.IsNullOrWhiteSpace(input) || !input.Contains("@") || !input.Contains(".")
+                    || input.IndexOf("@") > input.LastIndexOf(".") || input.Contains(" "))
                 {
                     ConsoleHelper.TextColor("⚠️ Email cannot be empty. And you must provide a valid email.", ConsoleColor.Red);
                     continue;
@@ -85,7 +86,7 @@ namespace OrderSystem
                 {
                     customer.Phone = input; break;
                 }
-                ConsoleHelper.TextColor("⚠️ Phone cannot be empty. And you must provide a valid phone number.", ConsoleColor.Red);
+                ConsoleHelper.TextColor("⚠️ Phone cannot be empty. Please provide a valid phone number.", ConsoleColor.Red);
             }
             while (true)
             {
@@ -97,13 +98,13 @@ namespace OrderSystem
                 {
                     customer.Address = input; break;
                 }
-                ConsoleHelper.TextColor("⚠️ Address cannot be empty. And you must provide a valid address.", ConsoleColor.Red);
+                ConsoleHelper.TextColor("⚠️ Address cannot be empty. Please provide a valid address.", ConsoleColor.Red);
             }
 
             customer.Save(conn);
 
             Console.WriteLine();
-            ConsoleHelper.TextColor($"✅ Customer '{customer.Name}' created successfully with ID: {customer.Id}\n", ConsoleColor.DarkGreen);
+            ConsoleHelper.TextColor($"✅ Customer (( {customer.Name} )) created successfully with ID: {customer.Id}\n", ConsoleColor.DarkGreen);
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
         }
