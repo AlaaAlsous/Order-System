@@ -70,12 +70,30 @@ namespace OrderSystem
                 }
                 ConsoleHelper.TextColor("⚠️ Invalid date format. Please use 'YYYY-MM-DD'.", ConsoleColor.Red);
             }
-            Console.WriteLine($"Status: {order.Status}");
+            while (true)
+            {
+                Console.Write("Status (Created/Paid/Delivered) [Default: Created]: ");
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
+                if (string.IsNullOrEmpty(input))
+                {
+                    order.Status = "Created"; break;
+                }
+                var validStatuses = new[] { "Created", "Paid", "Delivered" };
+                if (validStatuses.Contains(input, StringComparer.OrdinalIgnoreCase))
+                {
+                    order.Status = char.ToUpper(input[0]) + input.Substring(1).ToLower();
+                    break;
+                }
+                ConsoleHelper.TextColor("⚠️ Invalid status. Please enter 'Created', 'Paid', or 'Delivered'.", ConsoleColor.Red);
+            }
 
             order.Save(conn);
 
-            Console.WriteLine($"Order '{order.Id}' added successfully with ID: {order.Id}");
-            Console.WriteLine("Press any key to continue...");
+            Console.WriteLine();
+            ConsoleHelper.TextColor($"✅ Order (( {order.Id} )) added successfully\n", ConsoleColor.DarkGreen);
+            ConsoleHelper.TextColor("Press any key to continue...", ConsoleColor.Gray);
             Console.ReadKey();
         }
         public static bool CustomerExists(SqliteConnection conn, int customerId)
