@@ -14,5 +14,21 @@ namespace OrderSystem
             Console.WriteLine(text);
             Console.ResetColor();
         }
+
+        public static void WriteTableRow(string[] columns, ConsoleColor columnColor, ConsoleColor separatorColor)
+        {
+            Console.ForegroundColor = separatorColor;
+            Console.Write("| ");
+
+            for (int i = 0; i < columns.Length; i++)
+            {
+                Console.ForegroundColor = columnColor;
+                Console.Write(columns[i]);
+                Console.ForegroundColor = separatorColor;
+                Console.Write(" | ");
+            }
+            Console.WriteLine();
+            Console.ResetColor();
+        }
     }
 }
