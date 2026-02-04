@@ -43,6 +43,7 @@ namespace OrderSystem
                 if (!int.TryParse(input, out int customerId) || customerId <= 0)
                 {
                     ConsoleHelper.TextColor("⚠️ Invalid Customer ID. Please enter a valid number.", ConsoleColor.Red);
+                    continue;
                 }
                 if (!CustomerExists(conn, customerId))
                 {
@@ -99,7 +100,7 @@ namespace OrderSystem
         public static bool CustomerExists(SqliteConnection conn, int customerId)
         {
             using var command = conn.CreateCommand();
-            command.CommandText = "SELECT EXISTS(SELECT 1 FROM customers WHERE id = @id)";
+            command.CommandText = @"SELECT EXISTS(SELECT 1 FROM customers WHERE id = @id)";
             command.Parameters.AddWithValue("@id", customerId);
             return Convert.ToBoolean(command.ExecuteScalar());
         }

@@ -58,6 +58,7 @@ namespace OrderSystem
                 orderItem.OrderId = orderId;
                 break;
             }
+            int? availableStock = null;
             while (true)
             {
                 Console.Write("Product ID [Leave empty to skip]: ");
@@ -78,6 +79,11 @@ namespace OrderSystem
                 {
                     ConsoleHelper.TextColor($"Product with ID (( {productId} )) does not exist. Please enter a valid Product ID.", ConsoleColor.Red);
                     continue;
+                }
+                availableStock = GetProductStock(conn, productId);
+                if (availableStock.HasValue)
+                {
+                    Console.WriteLine($"Available stock: {availableStock.Value}");
                 }
                 orderItem.ProductId = productId;
                 break;
@@ -103,7 +109,36 @@ namespace OrderSystem
                 Console.ReadKey();
                 return;
             }
-            Console.Write("Quantity: "); orderItem.Quantity = int.Parse(Console.ReadLine() ?? "0");
+            while (true)
+            {
+                Console.Write("Quantity: ");
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
+                if (!int.TryParse(input, out int quantity))
+                {
+                    ConsoleHelper.TextColor("Invalid input. Please enter a valid number for Quantity.", ConsoleColor.Red);
+                    continue;
+                }
+                if (quantity <= 0)
+                {
+                    ConsoleHelper.TextColor("Quantity must be greater than 0.", ConsoleColor.Red);
+                    continue;
+                }
+                if (availableStock.HasValue && availableStock.Value <= 0)
+                {
+                    ConsoleHelper.TextColor($"Warning: Product with ID (( {orderItem.ProductId} )) is out of stock.", ConsoleColor.Yellow);
+                    continue;
+                }
+                if (availableStock.HasValue && quantity > availableStock.Value)
+                {
+                    ConsoleHelper.TextColor($"Warning: Insufficient stock for Product ID (( {orderItem.ProductId} )). Available: {availableStock.Value}, Required: {quantity}.", ConsoleColor.Yellow);
+                    continue;
+                }
+
+                orderItem.Quantity = quantity;
+                break;
+            }
             Console.Write("Price: "); orderItem.Price = decimal.Parse(Console.ReadLine() ?? "0");
 
             orderItem.Save(conn);
@@ -115,16 +150,24 @@ namespace OrderSystem
         public static bool OrderExists(SqliteConnection conn, int orderId)
         {
             using var command = conn.CreateCommand();
-            command.CommandText = "SELECT EXISTS(SELECT 1 FROM orders WHERE id = @orderId);";
+            command.CommandText = @"SELECT EXISTS(SELECT 1 FROM orders WHERE id = @orderId);";
             command.Parameters.AddWithValue("@orderId", orderId);
             return Convert.ToBoolean(command.ExecuteScalar());
         }
         public static bool ProductExists(SqliteConnection conn, int productId)
         {
             using var command = conn.CreateCommand();
-            command.CommandText = "SELECT EXISTS(SELECT 1 FROM products WHERE id = @productId);";
+            command.CommandText = @"SELECT EXISTS(SELECT 1 FROM products WHERE id = @productId);";
             command.Parameters.AddWithValue("@productId", productId);
             return Convert.ToBoolean(command.ExecuteScalar());
+        }
+        public static int? GetProductStock(SqliteConnection conn, int productId)
+        {
+            using var command = conn.CreateCommand();
+            command.CommandText = @"SELECT stock FROM products WHERE id = @productId;";
+            command.Parameters.AddWithValue("@productId", productId);
+            var result = command.ExecuteScalar();
+            return result != DBNull.Value ? (int?)Convert.ToInt32(result) : null;
         }
     }
 }
