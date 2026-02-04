@@ -38,7 +38,7 @@ namespace OrderSystem
             Console.WriteLine();
 
             OrderItem orderItem = new OrderItem();
-            
+
             while (true)
             {
                 Console.Write("Order ID: ");
@@ -58,7 +58,25 @@ namespace OrderSystem
                 orderItem.OrderId = orderId;
                 break;
             }
-            Console.Write("Product ID: "); orderItem.ProductId = int.Parse(Console.ReadLine() ?? "0");
+            while (true)
+            {
+                Console.Write("Product ID: ");
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
+                if (!int.TryParse(input, out int productId))
+                {
+                    ConsoleHelper.TextColor("Invalid input. Please enter a valid integer for Product ID.", ConsoleColor.Red);
+                    continue;
+                }
+                if (!ProductExists(conn, productId))
+                {
+                    ConsoleHelper.TextColor($"Product with ID (( {productId} )) does not exist. Please enter a valid Product ID.", ConsoleColor.Red);
+                    continue;
+                }
+                orderItem.ProductId = productId;
+                break;
+            }
             Console.Write("Description: "); orderItem.Description = Console.ReadLine() ?? "";
             Console.Write("Quantity: "); orderItem.Quantity = int.Parse(Console.ReadLine() ?? "0");
             Console.Write("Price: "); orderItem.Price = decimal.Parse(Console.ReadLine() ?? "0");
@@ -74,6 +92,13 @@ namespace OrderSystem
             using var command = conn.CreateCommand();
             command.CommandText = "SELECT EXISTS(SELECT 1 FROM orders WHERE id = @orderId);";
             command.Parameters.AddWithValue("@orderId", orderId);
+            return Convert.ToBoolean(command.ExecuteScalar());
+        }
+        public static bool ProductExists(SqliteConnection conn, int productId)
+        {
+            using var command = conn.CreateCommand();
+            command.CommandText = "SELECT EXISTS(SELECT 1 FROM products WHERE id = @productId);";
+            command.Parameters.AddWithValue("@productId", productId);
             return Convert.ToBoolean(command.ExecuteScalar());
         }
     }
