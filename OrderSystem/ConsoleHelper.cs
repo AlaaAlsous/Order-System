@@ -8,5 +8,11 @@ namespace OrderSystem
             int leftPadding = (width - text.Length) / 2;
             return text.PadLeft(leftPadding + text.Length).PadRight(width);
         }
+        public static void TextColor(string text, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine(text);
+            Console.ResetColor();
+        }
     }
 }
