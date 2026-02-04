@@ -26,10 +26,27 @@ namespace OrderSystem
 
         public static void Add(SqliteConnection conn)
         {
-            Console.WriteLine("--- Add Order ---");
-            Order order = new Order();
+            Console.Clear();
+            Console.WriteLine();
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("CREATE ORDER", Console.WindowWidth - 1), ConsoleColor.Cyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            Console.WriteLine();
 
-            Console.Write("Customer ID: "); order.CustomerId = int.Parse(Console.ReadLine() ?? "0");
+            Order order = new Order();
+            while (true)
+            {
+                Console.Write("Customer ID: ");
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
+                if (!int.TryParse(input, out int customerId) || customerId <= 0)
+                {
+                    ConsoleHelper.TextColor("⚠️ Invalid Customer ID. Please enter a valid number.", ConsoleColor.Red);
+                }
+                order.CustomerId = customerId;
+                break;
+            }
             Console.WriteLine($"Order Date and Time: {order.OrderDate:yyyy-MM-dd HH:mm:ss}");
             Console.WriteLine($"Status: {order.Status}");
 
