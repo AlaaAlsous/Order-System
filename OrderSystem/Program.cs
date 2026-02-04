@@ -22,6 +22,16 @@ namespace OrderSystem
                 );
             ";
             command.ExecuteNonQuery();
+
+            command.CommandText = @"
+                Create TABLE IF NOT EXISTS products (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE,
+                unit_price REAL NOT NULL,
+                stock INTEGER NOT NULL
+                );
+            ";
+            command.ExecuteNonQuery();
         }
     }
 }
