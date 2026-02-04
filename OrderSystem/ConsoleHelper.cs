@@ -30,5 +30,40 @@ namespace OrderSystem
             Console.WriteLine();
             Console.ResetColor();
         }
+
+        public static string? ReadLineWithEscape()
+        {
+            string input = "";
+            while (true)
+            {
+                var key = Console.ReadKey(true);
+
+                if (key.Key == ConsoleKey.Escape)
+                {
+                    ConsoleHelper.TextColor("\n\nOperation Cancelled. Returning to main menu...", ConsoleColor.DarkGray);
+                    ConsoleHelper.TextColor("Press any key to continue...\n", ConsoleColor.DarkGray);
+                    Console.ReadKey(true);
+                    return null;
+                }
+                else if (key.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    return input;
+                }
+                else if (key.Key == ConsoleKey.Backspace)
+                {
+                    if (input.Length > 0)
+                    {
+                        input = input.Substring(0, input.Length - 1);
+                        Console.Write("\b \b");
+                    }
+                }
+                else if (!char.IsControl(key.KeyChar))
+                {
+                    input += key.KeyChar;
+                    Console.Write(key.KeyChar);
+                }
+            }
+        }
     }
 }
