@@ -30,10 +30,34 @@ namespace OrderSystem
 
         public static void Add(SqliteConnection conn)
         {
-            Console.WriteLine("--- Add Order Item ---");
-            OrderItem orderItem = new OrderItem();
+            Console.Clear();
+            Console.WriteLine();
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("ADD ORDER ITEM", Console.WindowWidth - 1), ConsoleColor.Cyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            Console.WriteLine();
 
-            Console.Write("Order ID: "); orderItem.OrderId = int.Parse(Console.ReadLine() ?? "0");
+            OrderItem orderItem = new OrderItem();
+            
+            while (true)
+            {
+                Console.Write("Order ID: ");
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
+                if (!int.TryParse(input, out int orderId))
+                {
+                    ConsoleHelper.TextColor("Invalid input. Please enter a valid number for Order ID.", ConsoleColor.Red);
+                    continue;
+                }
+                if (!OrderExists(conn, orderId))
+                {
+                    ConsoleHelper.TextColor($"Order with ID (( {orderId} )) does not exist. Please enter a valid Order ID.", ConsoleColor.Red);
+                    continue;
+                }
+                orderItem.OrderId = orderId;
+                break;
+            }
             Console.Write("Product ID: "); orderItem.ProductId = int.Parse(Console.ReadLine() ?? "0");
             Console.Write("Description: "); orderItem.Description = Console.ReadLine() ?? "";
             Console.Write("Quantity: "); orderItem.Quantity = int.Parse(Console.ReadLine() ?? "0");
@@ -44,6 +68,13 @@ namespace OrderSystem
             Console.WriteLine($"Order item '{orderItem.Id}' added successfully with ID: {orderItem.Id}.");
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
+        }
+        public static bool OrderExists(SqliteConnection conn, int orderId)
+        {
+            using var command = conn.CreateCommand();
+            command.CommandText = "SELECT EXISTS(SELECT 1 FROM orders WHERE id = @orderId);";
+            command.Parameters.AddWithValue("@orderId", orderId);
+            return Convert.ToBoolean(command.ExecuteScalar());
         }
     }
 }
