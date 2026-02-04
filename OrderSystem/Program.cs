@@ -106,6 +106,20 @@ namespace OrderSystem
                 else if (Key == ConsoleKey.Enter)
                 {
                     Console.Clear();
+                    switch (position)
+                    {
+                        case 0: Customer.Add(connection); break;
+                        case 1: Product.Add(connection); break;
+                        case 2: Order.Add(connection); break;
+                        case 3: OrderItem.Add(connection); break;
+                        case 4: ShowOrders(connection); break;
+                        case 5:
+                            Console.WriteLine();
+                            Console.WriteLine(ConsoleHelper.CenterText("Thank you for using Order System App!\n", 152));
+                            Console.WriteLine(ConsoleHelper.CenterText("Press any key to exit...\n", 152));
+                            Console.ReadKey();
+                            return;
+                    }
                 }
             }
         }
