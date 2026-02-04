@@ -111,7 +111,7 @@ namespace OrderSystem
                     {
                         case 0: Customer.Add(connection); break;
                         case 1: Product.Add(connection); break;
-                        case 2: //Order.Add(connection); break;
+                        case 2: Order.Add(connection); break;
                         case 3: //OrderItem.Add(connection); break;
                         case 4: //ShowOrders(connection); break;
                         case 5:
