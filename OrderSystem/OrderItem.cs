@@ -47,12 +47,12 @@ namespace OrderSystem
                 input = input.Trim();
                 if (!int.TryParse(input, out int orderId))
                 {
-                    ConsoleHelper.TextColor("Invalid input. Please enter a valid number for Order ID.", ConsoleColor.Red);
+                    ConsoleHelper.TextColor("⚠️ Invalid input. Please enter a valid number.\n", ConsoleColor.Red);
                     continue;
                 }
                 if (!OrderExists(conn, orderId))
                 {
-                    ConsoleHelper.TextColor($"Order with ID (( {orderId} )) does not exist. Please enter a valid Order ID.", ConsoleColor.Red);
+                    ConsoleHelper.TextColor($"⚠️ Order with ID (( {orderId} )) does not exist. Please enter a valid Order ID.\n", ConsoleColor.Red);
                     continue;
                 }
                 orderItem.OrderId = orderId;
@@ -72,18 +72,23 @@ namespace OrderSystem
                 }
                 if (!int.TryParse(input, out int productId))
                 {
-                    ConsoleHelper.TextColor("Invalid input. Please enter a valid number for Product ID.", ConsoleColor.Red);
+                    ConsoleHelper.TextColor("⚠️ Invalid input. Please enter a valid number.\n", ConsoleColor.Red);
                     continue;
                 }
                 if (!ProductExists(conn, productId))
                 {
-                    ConsoleHelper.TextColor($"Product with ID (( {productId} )) does not exist. Please enter a valid Product ID.", ConsoleColor.Red);
+                    ConsoleHelper.TextColor($"⚠️ Product with ID (( {productId} )) does not exist. Please enter a valid Product ID.\n", ConsoleColor.Red);
                     continue;
                 }
                 availableStock = GetProductStock(conn, productId);
                 if (availableStock.HasValue)
                 {
-                    Console.WriteLine($"Available stock: {availableStock.Value}");
+                    ConsoleHelper.TextColor($"📢 Available stock: {availableStock.Value}", ConsoleColor.DarkYellow);
+                }
+                var productPrice = GetProductPrice(conn, productId);
+                if (productPrice.HasValue)
+                {
+                    ConsoleHelper.TextColor($"📢 Product unit price: {productPrice.Value:F2} kr", ConsoleColor.DarkYellow);
                 }
                 orderItem.ProductId = productId;
                 break;
@@ -99,12 +104,12 @@ namespace OrderSystem
                     orderItem.Description = input;
                     break;
                 }
-                ConsoleHelper.TextColor("Invalid input. Description cannot exceed 25 characters.", ConsoleColor.Red);
+                ConsoleHelper.TextColor("⚠️ Invalid input. Description cannot exceed 25 characters.\n", ConsoleColor.Red);
             }
 
             if (!orderItem.ProductId.HasValue && string.IsNullOrEmpty(orderItem.Description))
             {
-                ConsoleHelper.TextColor("⚠️ You must provide either a Product ID or a Description (or both).", ConsoleColor.Red);
+                ConsoleHelper.TextColor("⚠️ You must provide either a Product ID or a Description (or both).\n", ConsoleColor.Red);
                 Console.WriteLine("Press any key to continue...");
                 Console.ReadKey();
                 return;
@@ -117,34 +122,54 @@ namespace OrderSystem
                 input = input.Trim();
                 if (!int.TryParse(input, out int quantity))
                 {
-                    ConsoleHelper.TextColor("Invalid input. Please enter a valid number for Quantity.", ConsoleColor.Red);
+                    ConsoleHelper.TextColor("⚠️ Invalid input. Please enter a valid number for Quantity.\n", ConsoleColor.Red);
                     continue;
                 }
                 if (quantity <= 0)
                 {
-                    ConsoleHelper.TextColor("Quantity must be greater than 0.", ConsoleColor.Red);
+                    ConsoleHelper.TextColor("⚠️ Quantity must be greater than 0.\n", ConsoleColor.Red);
                     continue;
                 }
                 if (availableStock.HasValue && availableStock.Value <= 0)
                 {
-                    ConsoleHelper.TextColor($"Warning: Product with ID (( {orderItem.ProductId} )) is out of stock.", ConsoleColor.Yellow);
+                    ConsoleHelper.TextColor($"⚠️ Warning: Product with ID (( {orderItem.ProductId} )) is out of stock.\n", ConsoleColor.Yellow);
                     continue;
                 }
                 if (availableStock.HasValue && quantity > availableStock.Value)
                 {
-                    ConsoleHelper.TextColor($"Warning: Insufficient stock for Product ID (( {orderItem.ProductId} )). Available: {availableStock.Value}, Required: {quantity}.", ConsoleColor.Yellow);
+                    ConsoleHelper.TextColor($"⚠️ Warning: Insufficient stock for Product ID (( {orderItem.ProductId} )). Available: {availableStock.Value}, Required: {quantity}.\n", ConsoleColor.Yellow);
                     continue;
                 }
 
                 orderItem.Quantity = quantity;
                 break;
             }
-            Console.Write("Price: "); orderItem.Price = decimal.Parse(Console.ReadLine() ?? "0");
+            while (true)
+            {
+                Console.Write("Price: ");
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
+                if (!decimal.TryParse(input, out decimal price))
+                {
+                    ConsoleHelper.TextColor("⚠️ Invalid input. Please enter a valid unit price.\n", ConsoleColor.Red);
+                    continue;
+                }
+                if (price <= 0)
+                {
+                    ConsoleHelper.TextColor("⚠️ Price must be greater than 0.\n", ConsoleColor.Red);
+                    continue;
+                }
+
+                orderItem.Price = price;
+                break;
+            }
 
             orderItem.Save(conn);
 
-            Console.WriteLine($"Order item '{orderItem.Id}' added successfully with ID: {orderItem.Id}.");
-            Console.WriteLine("Press any key to continue...");
+            Console.WriteLine();
+            ConsoleHelper.TextColor($"✅ Order item (( {orderItem.Id} )) added successfully\n", ConsoleColor.DarkGreen);
+            ConsoleHelper.TextColor("Press any key to continue...", ConsoleColor.Gray);
             Console.ReadKey();
         }
         public static bool OrderExists(SqliteConnection conn, int orderId)
@@ -154,6 +179,7 @@ namespace OrderSystem
             command.Parameters.AddWithValue("@orderId", orderId);
             return Convert.ToBoolean(command.ExecuteScalar());
         }
+
         public static bool ProductExists(SqliteConnection conn, int productId)
         {
             using var command = conn.CreateCommand();
@@ -161,6 +187,7 @@ namespace OrderSystem
             command.Parameters.AddWithValue("@productId", productId);
             return Convert.ToBoolean(command.ExecuteScalar());
         }
+
         public static int? GetProductStock(SqliteConnection conn, int productId)
         {
             using var command = conn.CreateCommand();
@@ -168,6 +195,19 @@ namespace OrderSystem
             command.Parameters.AddWithValue("@productId", productId);
             var result = command.ExecuteScalar();
             return result != DBNull.Value ? (int?)Convert.ToInt32(result) : null;
+        }
+
+        public static decimal? GetProductPrice(SqliteConnection conn, int productId)
+        {
+            using var command = conn.CreateCommand();
+            command.CommandText = @"SELECT unit_price FROM products WHERE id = @productId;";
+            command.Parameters.AddWithValue("@productId", productId);
+            var result = command.ExecuteScalar();
+            if (result != DBNull.Value)
+            {
+                return (decimal)Convert.ToDecimal(result);
+            }
+            return null;
         }
     }
 }

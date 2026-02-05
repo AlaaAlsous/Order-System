@@ -21,7 +21,14 @@ namespace OrderSystem
             command.Parameters.AddWithValue("@order_date", unixTime);
             command.Parameters.AddWithValue("@status", Status);
 
-            Id = Convert.ToInt32(command.ExecuteScalar());
+            try
+            {
+                Id = Convert.ToInt32(command.ExecuteScalar());
+            }
+            catch (SqliteException ex)
+            {
+                throw new InvalidOperationException("⚠️ Failed to create order. Please ensure the Customer ID exists.\n", ex);
+            }
         }
 
         public static void Add(SqliteConnection conn)
@@ -42,12 +49,12 @@ namespace OrderSystem
                 input = input.Trim();
                 if (!int.TryParse(input, out int customerId) || customerId <= 0)
                 {
-                    ConsoleHelper.TextColor("⚠️ Invalid Customer ID. Please enter a valid number.", ConsoleColor.Red);
+                    ConsoleHelper.TextColor("⚠️ Invalid Customer ID. Please enter a valid number.\n", ConsoleColor.Red);
                     continue;
                 }
                 if (!CustomerExists(conn, customerId))
                 {
-                    ConsoleHelper.TextColor("⚠️ Customer ID does not exist. Please enter a valid Customer ID.", ConsoleColor.Red);
+                    ConsoleHelper.TextColor("⚠️ Customer ID does not exist. Please enter a valid Customer ID.\n", ConsoleColor.Red);
                     continue;
                 }
                 order.CustomerId = customerId;
@@ -69,7 +76,7 @@ namespace OrderSystem
                     order.OrderDate = orderDate.ToUniversalTime();
                     break;
                 }
-                ConsoleHelper.TextColor("⚠️ Invalid date format. Please use 'YYYY-MM-DD'.", ConsoleColor.Red);
+                ConsoleHelper.TextColor("⚠️ Invalid date format. Please use 'YYYY-MM-DD'.\n", ConsoleColor.Red);
             }
             while (true)
             {
@@ -87,7 +94,7 @@ namespace OrderSystem
                     order.Status = char.ToUpper(input[0]) + input.Substring(1).ToLower();
                     break;
                 }
-                ConsoleHelper.TextColor("⚠️ Invalid status. Please enter 'Created', 'Paid', or 'Delivered'.", ConsoleColor.Red);
+                ConsoleHelper.TextColor("⚠️ Invalid status. Please enter 'Created', 'Paid', or 'Delivered'.\n", ConsoleColor.Red);
             }
 
             order.Save(conn);
@@ -100,7 +107,7 @@ namespace OrderSystem
         public static bool CustomerExists(SqliteConnection conn, int customerId)
         {
             using var command = conn.CreateCommand();
-            command.CommandText = @"SELECT EXISTS(SELECT 1 FROM customers WHERE id = @id)";
+            command.CommandText = "SELECT EXISTS(SELECT 1 FROM customers WHERE id = @id)";
             command.Parameters.AddWithValue("@id", customerId);
             return Convert.ToBoolean(command.ExecuteScalar());
         }

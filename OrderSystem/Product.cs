@@ -44,7 +44,7 @@ namespace OrderSystem
                     product.Name = input;
                     break;
                 }
-                ConsoleHelper.TextColor("Name cannot be empty. Please enter a valid name (between 2 and 20 characters).", ConsoleColor.Red);
+                ConsoleHelper.TextColor("⚠️ Name cannot be empty. Please enter a valid name (between 2 and 20 characters).\n", ConsoleColor.Red);
             }
             while (true)
             {
@@ -56,7 +56,7 @@ namespace OrderSystem
                     product.UnitPrice = unitPrice;
                     break;
                 }
-                ConsoleHelper.TextColor("⚠️ Invalid input. Please enter a valid unit price.", ConsoleColor.Red);
+                ConsoleHelper.TextColor("⚠️ Invalid input. Please enter a valid unit price.\n", ConsoleColor.Red);
             }
             while (true)
             {
@@ -68,7 +68,7 @@ namespace OrderSystem
                     product.Stock = stock;
                     break;
                 }
-                ConsoleHelper.TextColor("⚠️ Invalid input. Please enter a valid stock quantity.", ConsoleColor.Red);
+                ConsoleHelper.TextColor("⚠️ Invalid input. Please enter a valid stock quantity.\n", ConsoleColor.Red);
             }
 
             product.Save(conn);

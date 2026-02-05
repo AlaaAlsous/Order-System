@@ -62,15 +62,14 @@ namespace OrderSystem
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
-                if (string.IsNullOrWhiteSpace(input) || !input.Contains("@") || !input.Contains(".")
-                    || input.IndexOf("@") > input.LastIndexOf(".") || input.Contains(" "))
+                if (input.Length == 0 || !input.Contains("@") || !input.Contains(".") || input.IndexOf("@") > input.LastIndexOf(".") || input.Contains(" "))
                 {
-                    ConsoleHelper.TextColor("⚠️ Email cannot be empty. And you must provide a valid email.", ConsoleColor.Red);
+                    ConsoleHelper.TextColor("⚠️ Email cannot be empty. And you must provide a valid email.\n", ConsoleColor.Red);
                     continue;
                 }
                 if (EmailExists(conn, input))
                 {
-                    ConsoleHelper.TextColor("⚠️ This email already exists. Please use a different email.", ConsoleColor.Red);
+                    ConsoleHelper.TextColor("⚠️ This email already exists. Please use a different email.\n", ConsoleColor.Red);
                     continue;
                 }
                 customer.Email = input;
@@ -82,11 +81,11 @@ namespace OrderSystem
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
-                if (!string.IsNullOrWhiteSpace(input) && input.Length >= 5 && input.Length <= 15 && long.TryParse(input, out _))
+                if (input.Length >= 5 && input.Length <= 20 && long.TryParse(input, out _))
                 {
                     customer.Phone = input; break;
                 }
-                ConsoleHelper.TextColor("⚠️ Phone cannot be empty. Please provide a valid phone number.", ConsoleColor.Red);
+                ConsoleHelper.TextColor("⚠️ Phone cannot be empty. And please provide a valid phone number.\n", ConsoleColor.Red);
             }
             while (true)
             {
@@ -94,11 +93,11 @@ namespace OrderSystem
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
-                if (!string.IsNullOrWhiteSpace(input) && input.Length >= 5 && input.Length <= 100)
+                if (input.Length >= 5 && input.Length <= 100)
                 {
                     customer.Address = input; break;
                 }
-                ConsoleHelper.TextColor("⚠️ Address cannot be empty. Please provide a valid address.", ConsoleColor.Red);
+                ConsoleHelper.TextColor("⚠️ Address cannot be empty. And please provide a valid address.\n", ConsoleColor.Red);
             }
 
             customer.Save(conn);
