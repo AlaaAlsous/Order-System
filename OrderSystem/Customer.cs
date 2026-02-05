@@ -1,3 +1,4 @@
+using Dapper;
 using Microsoft.Data.Sqlite;
 
 namespace OrderSystem
@@ -12,20 +13,13 @@ namespace OrderSystem
 
         public void Save(SqliteConnection conn)
         {
-            using var command = conn.CreateCommand();
-            command.CommandText = @"
-                INSERT INTO customers (name, email, phone, address)
-                VALUES (@name, @email, @phone, @address)
-                RETURNING Id;
-            ";
-            command.Parameters.AddWithValue("@name", Name);
-            command.Parameters.AddWithValue("@email", Email);
-            command.Parameters.AddWithValue("@phone", Phone);
-            command.Parameters.AddWithValue("@address", Address);
-
             try
             {
-                Id = Convert.ToInt64(command.ExecuteScalar());
+                Id = conn.QuerySingle<long>(@"
+                    INSERT INTO customers (name, email, phone, address)
+                    VALUES (@name, @email, @phone, @address)
+                    RETURNING Id;
+                ", new { name = Name, email = Email, phone = Phone, address = Address });
             }
             catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
             {
@@ -109,11 +103,7 @@ namespace OrderSystem
         }
         public static bool EmailExists(SqliteConnection conn, string email)
         {
-            using var command = conn.CreateCommand();
-            command.CommandText = @"SELECT EXISTS(SELECT 1 FROM customers WHERE email = @email);";
-            command.Parameters.AddWithValue("@email", email);
-
-            return Convert.ToBoolean(command.ExecuteScalar());
+            return conn.QuerySingle<bool>(@"SELECT EXISTS(SELECT 1 FROM customers WHERE email = @email);", new { email });
         }
     }
 }

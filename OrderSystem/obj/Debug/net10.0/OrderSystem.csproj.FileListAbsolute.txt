@@ -42,3 +42,4 @@ C:\Users\o00-0\Desktop\Pro\Databaser\GitHub Inlämningsuppgift\net25-kurs-3-valf
 C:\Users\o00-0\Desktop\Pro\Databaser\GitHub Inlämningsuppgift\net25-kurs-3-valfri-alaa_alsous\OrderSystem\obj\Debug\net10.0\OrderSystem.pdb
 C:\Users\o00-0\Desktop\Pro\Databaser\GitHub Inlämningsuppgift\net25-kurs-3-valfri-alaa_alsous\OrderSystem\obj\Debug\net10.0\OrderSystem.genruntimeconfig.cache
 C:\Users\o00-0\Desktop\Pro\Databaser\GitHub Inlämningsuppgift\net25-kurs-3-valfri-alaa_alsous\OrderSystem\obj\Debug\net10.0\ref\OrderSystem.dll
+C:\Users\o00-0\Desktop\Pro\Databaser\GitHub Inlämningsuppgift\net25-kurs-3-valfri-alaa_alsous\OrderSystem\bin\Debug\net10.0\Dapper.dll
