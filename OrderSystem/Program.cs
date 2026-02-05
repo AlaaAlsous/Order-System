@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using Dapper;
+using Microsoft.Data.Sqlite;
 
 namespace OrderSystem
 {
@@ -7,16 +8,14 @@ namespace OrderSystem
         static void Main(string[] args)
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            using var connection = new SqliteConnection("Data Source = order_system.sqlite");
-            connection.Open();
+            using var database = new SqliteConnection("Data Source = order_system.sqlite");
+            database.Open();
 
-            var command = connection.CreateCommand();
-            command.CommandText = @"
+            database.Execute(@"
                 PRAGMA foreign_keys = ON;
-            ";
-            command.ExecuteNonQuery();
+            ");
 
-            command.CommandText = @"
+            database.Execute(@"
                 CREATE TABLE IF NOT EXISTS customers (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
@@ -24,32 +23,29 @@ namespace OrderSystem
                 phone TEXT,
                 address TEXT
                 );
-            ";
-            command.ExecuteNonQuery();
+            ");
 
-            command.CommandText = @"
-                Create TABLE IF NOT EXISTS products (
+            database.Execute(@"
+                CREATE TABLE IF NOT EXISTS products (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL UNIQUE CHECK(length(name)<=15),
                 unit_price REAL NOT NULL,
                 stock INTEGER NOT NULL
                 );
-            ";
-            command.ExecuteNonQuery();
+            ");
 
-            command.CommandText = @"
-                Create TABLE IF NOT EXISTS orders (
+            database.Execute(@"
+                CREATE TABLE IF NOT EXISTS orders (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
 	            customer_id INTEGER NOT NULL,
 	            order_date INTEGER NOT NULL,
 	            status TEXT NOT NULL CHECK(status IN('Created','Paid','Delivered')),
 	            FOREIGN KEY (customer_id) REFERENCES customers(id)
                 );
-            ";
-            command.ExecuteNonQuery();
+            ");
 
-            command.CommandText = @"
-                Create TABLE IF NOT EXISTS order_rows (
+            database.Execute(@"
+                CREATE TABLE IF NOT EXISTS order_rows (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
 	            order_id INTEGER NOT NULL,
                 product_id INTEGER,
@@ -60,15 +56,21 @@ namespace OrderSystem
 	            FOREIGN KEY (product_id) REFERENCES products(id),
                 CHECK (product_id IS NOT NULL OR description IS NOT NULL)
                 );
-            ";
-            command.ExecuteNonQuery();
+            ");
 
             string[] menu = {
             ConsoleHelper.CenterText("CREATE CUSTOMER", 15),
+            ConsoleHelper.CenterText("SHOW CUSTOMERS", 15),
+            ConsoleHelper.CenterText("DELETE CUSTOMER", 15),
             ConsoleHelper.CenterText("CREATE PRODUCT", 15),
+            ConsoleHelper.CenterText("SHOW PRODUCTS", 15),
+            ConsoleHelper.CenterText("DELETE PRODUCT", 15),
             ConsoleHelper.CenterText("CREATE ORDER", 15),
+            ConsoleHelper.CenterText("SHOW ORDERS", 15),
+            ConsoleHelper.CenterText("DELETE ORDER", 15),
             ConsoleHelper.CenterText("ADD ORDER ITEM", 15),
-            ConsoleHelper.CenterText("ORDER OVERVIEW", 15),
+            ConsoleHelper.CenterText("SHOW ORDER ITEMS", 15),
+            ConsoleHelper.CenterText("DELETE ORDER ITEM", 15),
             ConsoleHelper.CenterText("EXIT", 15)
              };
             int position = 0;
@@ -110,12 +112,19 @@ namespace OrderSystem
                     Console.Clear();
                     switch (position)
                     {
-                        case 0: Customer.Add(connection); break;
-                        case 1: Product.Add(connection); break;
-                        case 2: Order.Add(connection); break;
-                        case 3: OrderItem.Add(connection); break;
-                        case 4: ShowOrders(connection); break;
-                        case 5:
+                        case 0: Customer.Add(database); break;
+                        //case 1: ShowCustomers(database); break;
+                        //case 2: DeleteCustomer(database); break;
+                        case 3: Product.Add(database); break;
+                        //case 4: ShowProducts(database); break;
+                        //case 5: DeleteProduct(database); break;
+                        case 6: Order.Add(database); break;
+                        //case 7: ShowOrders(database); break;
+                        //case 8: DeleteOrder(database); break;
+                        case 9: OrderItem.Add(database); break;
+                        case 10: ShowOrderItems(database); break;
+                        //case 11: DeleteOrderItems(database); break;
+                        case 12:
                             Console.WriteLine();
                             ConsoleHelper.TextColor(ConsoleHelper.CenterText("Thank you for choosing the Order System App!\n", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
                             ConsoleHelper.TextColor(ConsoleHelper.CenterText("Press any key to exit...\n", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
@@ -125,27 +134,26 @@ namespace OrderSystem
                 }
             }
         }
-        public static void ShowOrders(SqliteConnection conn)
+        public static void ShowOrderItems(SqliteConnection conn)
         {
-            using var command = conn.CreateCommand();
-            command.CommandText = @"
+            var orderItems = conn.Query(@"
                SELECT 
-	                orders.id AS 'Order ID',
-	                customers.name AS 'Customer',
-	                orders.order_date AS 'Order Date',
-	                orders.status AS 'Status',
-	                order_rows.id AS 'Order Item ID',
-	                products.name AS 'Product Name',
-	                order_rows.description AS 'Description',
-	                order_rows.quantity AS 'Quantity',
-	                order_rows.unit_price  AS 'Unit Price',
-	                (order_rows.quantity*order_rows.unit_price) AS 'Total Price'
+	                orders.id AS orderid,
+	                customers.name AS customername,
+	                orders.order_date AS orderdate,
+	                orders.status AS status,
+	                order_rows.id AS orderitemid,
+	                products.name AS productname,
+	                order_rows.description AS description,
+	                order_rows.quantity AS quantity,
+	                order_rows.unit_price  AS unitprice,
+	                (order_rows.quantity*order_rows.unit_price) AS totalprice
                 FROM orders 
                     JOIN customers ON orders.customer_id = customers.Id
                     JOIN order_rows ON orders.id = order_rows.order_id
                     LEFT JOIN products ON order_rows.product_id = products.id
-            ";
-            using var reader = command.ExecuteReader();
+            ");
+
             Console.WriteLine();
             ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
             ConsoleHelper.TextColor(ConsoleHelper.CenterText("ORDER OVERVIEW", Console.WindowWidth - 1), ConsoleColor.Cyan);
@@ -168,19 +176,19 @@ namespace OrderSystem
             }, ConsoleColor.Cyan, ConsoleColor.DarkGray);
             ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
 
-            while (reader.Read())
+            foreach (var item in orderItems)
             {
-                long orderId = reader.GetInt64(0);
-                string customerName = reader.GetString(1);
-                long orderDateUnix = reader.GetInt64(2);
+                long orderId = item.orderid;
+                string customerName = item.customername;
+                long orderDateUnix = item.orderdate;
                 DateTime orderDate = DateTimeOffset.FromUnixTimeSeconds(orderDateUnix).DateTime;
-                string status = reader.GetString(3);
-                long orderItemId = reader.GetInt64(4);
-                string productName = reader.IsDBNull(5) ? "" : reader.GetString(5);
-                string description = reader.IsDBNull(6) ? "" : reader.GetString(6);
-                long quantity = reader.GetInt64(7);
-                decimal unitPrice = reader.GetDecimal(8);
-                decimal totalPrice = reader.GetDecimal(9);
+                string status = item.status;
+                long orderItemId = item.orderitemid;
+                string productName = item.productname ?? "";
+                string description = item.description ?? "";
+                long quantity = item.quantity;
+                decimal unitPrice = Convert.ToDecimal(item.unitprice);
+                decimal totalPrice = Convert.ToDecimal(item.totalprice);
 
                 ConsoleHelper.WriteTableRow(new string[]
                 {
