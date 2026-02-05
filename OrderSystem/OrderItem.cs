@@ -167,6 +167,11 @@ namespace OrderSystem
 
             orderItem.Save(conn);
 
+            if (orderItem.ProductId.HasValue)
+            {
+                UpdateProductStock(conn, orderItem.ProductId.Value, orderItem.Quantity);
+            }
+
             Console.WriteLine();
             ConsoleHelper.TextColor($"✅ Order item (( {orderItem.Id} )) added successfully\n", ConsoleColor.DarkGreen);
             ConsoleHelper.TextColor("Press any key to continue...", ConsoleColor.Gray);
@@ -208,6 +213,15 @@ namespace OrderSystem
                 return (decimal)Convert.ToDecimal(result);
             }
             return null;
+        }
+
+        public static void UpdateProductStock(SqliteConnection conn, int productId, int quantity)
+        {
+            using var command = conn.CreateCommand();
+            command.CommandText = @"UPDATE products SET stock = stock - @quantity WHERE id = @productId;";
+            command.Parameters.AddWithValue("@productId", productId);
+            command.Parameters.AddWithValue("@quantity", quantity);
+            command.ExecuteNonQuery();
         }
     }
 }
