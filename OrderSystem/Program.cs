@@ -64,12 +64,12 @@ namespace OrderSystem
             command.ExecuteNonQuery();
 
             string[] menu = {
-            ConsoleHelper.CenterText("Create Customer", 15),
-            ConsoleHelper.CenterText("Create Product", 15),
-            ConsoleHelper.CenterText("Create Order", 15),
-            ConsoleHelper.CenterText("Add Order Item", 15),
-            ConsoleHelper.CenterText("Show Orders", 15),
-            ConsoleHelper.CenterText("Exit", 15)
+            ConsoleHelper.CenterText("CREATE CUSTOMER", 15),
+            ConsoleHelper.CenterText("CREATE PRODUCT", 15),
+            ConsoleHelper.CenterText("CREATE ORDER", 15),
+            ConsoleHelper.CenterText("ADD ORDER ITEM", 15),
+            ConsoleHelper.CenterText("ORDER OVERVIEW", 15),
+            ConsoleHelper.CenterText("EXIT", 15)
              };
             int position = 0;
 
@@ -148,7 +148,7 @@ namespace OrderSystem
             using var reader = command.ExecuteReader();
             Console.WriteLine();
             ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("ORDERS", Console.WindowWidth - 1), ConsoleColor.Cyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("ORDER OVERVIEW", Console.WindowWidth - 1), ConsoleColor.Cyan);
             ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
             Console.WriteLine();
             string separator = new string('-', 152);
@@ -170,15 +170,15 @@ namespace OrderSystem
 
             while (reader.Read())
             {
-                int orderId = reader.GetInt32(0);
+                long orderId = reader.GetInt64(0);
                 string customerName = reader.GetString(1);
                 long orderDateUnix = reader.GetInt64(2);
                 DateTime orderDate = DateTimeOffset.FromUnixTimeSeconds(orderDateUnix).DateTime;
                 string status = reader.GetString(3);
-                int orderItemId = reader.GetInt32(4);
+                long orderItemId = reader.GetInt64(4);
                 string productName = reader.IsDBNull(5) ? "" : reader.GetString(5);
                 string description = reader.IsDBNull(6) ? "" : reader.GetString(6);
-                int quantity = reader.GetInt32(7);
+                long quantity = reader.GetInt64(7);
                 decimal unitPrice = reader.GetDecimal(8);
                 decimal totalPrice = reader.GetDecimal(9);
 

@@ -4,7 +4,7 @@ namespace OrderSystem
 {
     public class Customer
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string Name { get; set; } = "";
         public string Email { get; set; } = "";
         public string Phone { get; set; } = "";
@@ -25,7 +25,7 @@ namespace OrderSystem
 
             try
             {
-                Id = Convert.ToInt32(command.ExecuteScalar());
+                Id = Convert.ToInt64(command.ExecuteScalar());
             }
             catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
             {

@@ -4,10 +4,11 @@ namespace OrderSystem
 {
     public class Order
     {
-        public int Id { get; set; }
-        public int CustomerId { get; set; }
+        public long Id { get; set; }
+        public long CustomerId { get; set; }
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
         public string Status { get; set; } = "Created";
+
         public void Save(SqliteConnection conn)
         {
             using var command = conn.CreateCommand();
@@ -23,7 +24,7 @@ namespace OrderSystem
 
             try
             {
-                Id = Convert.ToInt32(command.ExecuteScalar());
+                Id = Convert.ToInt64(command.ExecuteScalar());
             }
             catch (SqliteException ex)
             {
@@ -47,7 +48,7 @@ namespace OrderSystem
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
-                if (!int.TryParse(input, out int customerId) || customerId <= 0)
+                if (!long.TryParse(input, out long customerId) || customerId <= 0)
                 {
                     ConsoleHelper.TextColor("⚠️ Invalid Customer ID. Please enter a valid number.\n", ConsoleColor.Red);
                     continue;
@@ -104,7 +105,7 @@ namespace OrderSystem
             ConsoleHelper.TextColor("Press any key to continue...", ConsoleColor.Gray);
             Console.ReadKey();
         }
-        public static bool CustomerExists(SqliteConnection conn, int customerId)
+        public static bool CustomerExists(SqliteConnection conn, long customerId)
         {
             using var command = conn.CreateCommand();
             command.CommandText = "SELECT EXISTS(SELECT 1 FROM customers WHERE id = @id)";

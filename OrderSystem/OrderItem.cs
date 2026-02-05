@@ -4,11 +4,11 @@ namespace OrderSystem
 {
     public class OrderItem
     {
-        public int Id { get; set; }
-        public int OrderId { get; set; }
-        public int? ProductId { get; set; }
+        public long Id { get; set; }
+        public long OrderId { get; set; }
+        public long? ProductId { get; set; }
         public string Description { get; set; } = "";
-        public int Quantity { get; set; }
+        public long Quantity { get; set; }
         public decimal Price { get; set; }
 
         public void Save(SqliteConnection conn)
@@ -25,7 +25,7 @@ namespace OrderSystem
             command.Parameters.AddWithValue("@quantity", Quantity);
             command.Parameters.AddWithValue("@unit_price", Price);
 
-            Id = Convert.ToInt32(command.ExecuteScalar());
+            Id = Convert.ToInt64(command.ExecuteScalar());
         }
 
         public static void Add(SqliteConnection conn)
@@ -45,7 +45,7 @@ namespace OrderSystem
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
-                if (!int.TryParse(input, out int orderId))
+                if (!long.TryParse(input, out long orderId))
                 {
                     ConsoleHelper.TextColor("⚠️ Invalid input. Please enter a valid number.\n", ConsoleColor.Red);
                     continue;
@@ -58,7 +58,7 @@ namespace OrderSystem
                 orderItem.OrderId = orderId;
                 break;
             }
-            int? availableStock = null;
+            long? availableStock = null;
             while (true)
             {
                 Console.Write("Product ID [Leave empty to skip]: ");
@@ -70,7 +70,7 @@ namespace OrderSystem
                     orderItem.ProductId = null;
                     break;
                 }
-                if (!int.TryParse(input, out int productId))
+                if (!long.TryParse(input, out long productId))
                 {
                     ConsoleHelper.TextColor("⚠️ Invalid input. Please enter a valid number.\n", ConsoleColor.Red);
                     continue;
@@ -120,7 +120,7 @@ namespace OrderSystem
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
-                if (!int.TryParse(input, out int quantity))
+                if (!long.TryParse(input, out long quantity))
                 {
                     ConsoleHelper.TextColor("⚠️ Invalid input. Please enter a valid number for Quantity.\n", ConsoleColor.Red);
                     continue;
@@ -177,7 +177,7 @@ namespace OrderSystem
             ConsoleHelper.TextColor("Press any key to continue...", ConsoleColor.Gray);
             Console.ReadKey();
         }
-        public static bool OrderExists(SqliteConnection conn, int orderId)
+        public static bool OrderExists(SqliteConnection conn, long orderId)
         {
             using var command = conn.CreateCommand();
             command.CommandText = @"SELECT EXISTS(SELECT 1 FROM orders WHERE id = @orderId);";
@@ -185,7 +185,7 @@ namespace OrderSystem
             return Convert.ToBoolean(command.ExecuteScalar());
         }
 
-        public static bool ProductExists(SqliteConnection conn, int productId)
+        public static bool ProductExists(SqliteConnection conn, long productId)
         {
             using var command = conn.CreateCommand();
             command.CommandText = @"SELECT EXISTS(SELECT 1 FROM products WHERE id = @productId);";
@@ -193,16 +193,16 @@ namespace OrderSystem
             return Convert.ToBoolean(command.ExecuteScalar());
         }
 
-        public static int? GetProductStock(SqliteConnection conn, int productId)
+        public static long? GetProductStock(SqliteConnection conn, long productId)
         {
             using var command = conn.CreateCommand();
             command.CommandText = @"SELECT stock FROM products WHERE id = @productId;";
             command.Parameters.AddWithValue("@productId", productId);
             var result = command.ExecuteScalar();
-            return result != DBNull.Value ? (int?)Convert.ToInt32(result) : null;
+            return result != DBNull.Value ? (long?)Convert.ToInt64(result) : null;
         }
 
-        public static decimal? GetProductPrice(SqliteConnection conn, int productId)
+        public static decimal? GetProductPrice(SqliteConnection conn, long productId)
         {
             using var command = conn.CreateCommand();
             command.CommandText = @"SELECT unit_price FROM products WHERE id = @productId;";
@@ -215,7 +215,7 @@ namespace OrderSystem
             return null;
         }
 
-        public static void UpdateProductStock(SqliteConnection conn, int productId, int quantity)
+        public static void UpdateProductStock(SqliteConnection conn, long productId, long quantity)
         {
             using var command = conn.CreateCommand();
             command.CommandText = @"UPDATE products SET stock = stock - @quantity WHERE id = @productId;";

@@ -4,10 +4,11 @@ namespace OrderSystem
 {
     public class Product
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string Name { get; set; } = "";
-        public double UnitPrice { get; set; }
-        public int Stock { get; set; }
+        public decimal UnitPrice { get; set; }
+        public long Stock { get; set; }
+
         public void Save(SqliteConnection conn)
         {
             using var command = conn.CreateCommand();
@@ -20,7 +21,7 @@ namespace OrderSystem
             command.Parameters.AddWithValue("@unit_price", UnitPrice);
             command.Parameters.AddWithValue("@stock", Stock);
 
-            Id = Convert.ToInt32(command.ExecuteScalar());
+            Id = Convert.ToInt64(command.ExecuteScalar());
         }
         public static void Add(SqliteConnection conn)
         {
@@ -51,7 +52,7 @@ namespace OrderSystem
                 Console.Write("Unit Price: ");
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
-                if (double.TryParse(input, out double unitPrice) && unitPrice > 0)
+                if (decimal.TryParse(input, out decimal unitPrice) && unitPrice > 0)
                 {
                     product.UnitPrice = unitPrice;
                     break;
@@ -63,7 +64,7 @@ namespace OrderSystem
                 Console.Write("Stock: ");
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
-                if (int.TryParse(input, out int stock) && stock > 0)
+                if (long.TryParse(input, out long stock) && stock > 0)
                 {
                     product.Stock = stock;
                     break;
