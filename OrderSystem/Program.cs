@@ -28,6 +28,7 @@ namespace OrderSystem
                 CREATE TABLE IF NOT EXISTS addresses (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 customer_id INTEGER NOT NULL,
+                address_type TEXT NOT NULL CHECK(address_type IN('Delivery','Billing')),
                 street TEXT NOT NULL,
                 city TEXT NOT NULL,
                 zip_code TEXT NOT NULL,
@@ -69,10 +70,31 @@ namespace OrderSystem
                 );
             ");
 
+            database.Execute(@"
+                CREATE VIEW IF NOT EXISTS order_overview AS
+                SELECT 
+                    orders.id AS orderid,
+                    customers.id AS customerid,
+                    customers.name AS customername,
+                    orders.order_date AS orderdate,
+                    orders.status AS status,
+                    order_rows.id AS orderitemid,
+                    products.name AS productname,
+                    order_rows.description AS description,
+                    order_rows.quantity AS quantity,
+                    order_rows.unit_price AS unitprice,
+                    (order_rows.quantity * order_rows.unit_price) AS totalprice
+                FROM orders 
+                    JOIN customers ON orders.customer_id = customers.Id
+                    JOIN order_rows ON orders.id = order_rows.order_id
+                    LEFT JOIN products ON order_rows.product_id = products.id;
+            ");
+
             string[] menu = {
             ConsoleHelper.CenterText("CREATE CUSTOMER", 20),
             ConsoleHelper.CenterText("SHOW CUSTOMERS", 20),
             ConsoleHelper.CenterText("DELETE CUSTOMER", 20),
+            ConsoleHelper.CenterText("ADD ADDRESS", 20),
             ConsoleHelper.CenterText("CREATE PRODUCT", 20),
             ConsoleHelper.CenterText("SHOW PRODUCTS", 20),
             ConsoleHelper.CenterText("DELETE PRODUCT", 20),
@@ -126,16 +148,17 @@ namespace OrderSystem
                         case 0: Customer.Add(database); break;
                         //case 1: ShowCustomers(database); break;
                         //case 2: DeleteCustomer(database); break;
-                        case 3: Product.Add(database); break;
-                        //case 4: ShowProducts(database); break;
-                        //case 5: DeleteProduct(database); break;
-                        case 6: Order.Add(database); break;
-                        //case 7: ShowOrders(database); break;
-                        //case 8: DeleteOrder(database); break;
-                        case 9: OrderItem.Add(database); break;
-                        case 10: ShowOrderItems(database); break;
-                        //case 11: DeleteOrderItems(database); break;
-                        case 12:
+                        //case 3: Address.Add(database); break;
+                        case 4: Product.Add(database); break;
+                        //case 5: ShowProducts(database); break;
+                        //case 6: DeleteProduct(database); break;
+                        case 7: Order.Add(database); break;
+                        //case 8: ShowOrders(database); break;
+                        //case 9: DeleteOrder(database); break;
+                        case 10: OrderItem.Add(database); break;
+                        case 11: ShowOrderItems(database); break;
+                        //case 12: DeleteOrderItems(database); break;
+                        case 13:
                             Console.WriteLine();
                             ConsoleHelper.TextColor(ConsoleHelper.CenterText("Thank you for choosing the Order System App!\n", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
                             ConsoleHelper.TextColor(ConsoleHelper.CenterText("Press any key to exit...\n", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
@@ -147,23 +170,7 @@ namespace OrderSystem
         }
         public static void ShowOrderItems(SqliteConnection conn)
         {
-            var orderItems = conn.Query(@"
-               SELECT 
-	                orders.id AS orderid,
-	                customers.name AS customername,
-	                orders.order_date AS orderdate,
-	                orders.status AS status,
-	                order_rows.id AS orderitemid,
-	                products.name AS productname,
-	                order_rows.description AS description,
-	                order_rows.quantity AS quantity,
-	                order_rows.unit_price  AS unitprice,
-	                (order_rows.quantity*order_rows.unit_price) AS totalprice
-                FROM orders 
-                    JOIN customers ON orders.customer_id = customers.Id
-                    JOIN order_rows ON orders.id = order_rows.order_id
-                    LEFT JOIN products ON order_rows.product_id = products.id
-            ");
+            var orderItems = conn.Query("SELECT * FROM order_overview");
 
             Console.WriteLine();
             ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
