@@ -1,3 +1,4 @@
+using Dapper;
 using Microsoft.Data.Sqlite;
 
 namespace OrderSystem
@@ -13,19 +14,18 @@ namespace OrderSystem
 
         public void Save(SqliteConnection conn)
         {
-            using var command = conn.CreateCommand();
-            command.CommandText = @"
-            INSERT INTO order_rows (order_id, product_id, description, quantity, unit_price)
-            VALUES (@order_id, @product_id, @description, @quantity, @unit_price)
-            RETURNING Id;
-            ";
-            command.Parameters.AddWithValue("@order_id", OrderId);
-            command.Parameters.AddWithValue("@product_id", ProductId.HasValue ? (object)ProductId.Value : DBNull.Value);
-            command.Parameters.AddWithValue("@description", string.IsNullOrEmpty(Description) ? DBNull.Value : Description);
-            command.Parameters.AddWithValue("@quantity", Quantity);
-            command.Parameters.AddWithValue("@unit_price", Price);
-
-            Id = Convert.ToInt64(command.ExecuteScalar());
+            try
+            {
+                Id = conn.QuerySingle<long>(@"
+                INSERT INTO order_rows (order_id, product_id, description, quantity, unit_price)
+                VALUES (@order_id, @product_id, @description, @quantity, @unit_price)
+                RETURNING Id;
+            ", new { order_id = OrderId, product_id = ProductId, description = Description, quantity = Quantity, unit_price = Price });
+            }
+            catch (SqliteException ex)
+            {
+                throw new InvalidOperationException("⚠️ Failed to add order item. Please ensure all fields are valid.", ex);
+            }
         }
 
         public static void Add(SqliteConnection conn)
@@ -179,49 +179,27 @@ namespace OrderSystem
         }
         public static bool OrderExists(SqliteConnection conn, long orderId)
         {
-            using var command = conn.CreateCommand();
-            command.CommandText = @"SELECT EXISTS(SELECT 1 FROM orders WHERE id = @orderId);";
-            command.Parameters.AddWithValue("@orderId", orderId);
-            return Convert.ToBoolean(command.ExecuteScalar());
+            return conn.QuerySingle<bool>(@"SELECT EXISTS(SELECT 1 FROM orders WHERE id = @orderId);", new { orderId });
         }
 
         public static bool ProductExists(SqliteConnection conn, long productId)
         {
-            using var command = conn.CreateCommand();
-            command.CommandText = @"SELECT EXISTS(SELECT 1 FROM products WHERE id = @productId);";
-            command.Parameters.AddWithValue("@productId", productId);
-            return Convert.ToBoolean(command.ExecuteScalar());
+            return conn.QuerySingle<bool>(@"SELECT EXISTS(SELECT 1 FROM products WHERE id = @productId);", new { productId });
         }
 
         public static long? GetProductStock(SqliteConnection conn, long productId)
         {
-            using var command = conn.CreateCommand();
-            command.CommandText = @"SELECT stock FROM products WHERE id = @productId;";
-            command.Parameters.AddWithValue("@productId", productId);
-            var result = command.ExecuteScalar();
-            return result != DBNull.Value ? (long?)Convert.ToInt64(result) : null;
+            return conn.QuerySingle<long?>(@"SELECT stock FROM products WHERE id = @productId;", new { productId });
         }
 
         public static decimal? GetProductPrice(SqliteConnection conn, long productId)
         {
-            using var command = conn.CreateCommand();
-            command.CommandText = @"SELECT unit_price FROM products WHERE id = @productId;";
-            command.Parameters.AddWithValue("@productId", productId);
-            var result = command.ExecuteScalar();
-            if (result != DBNull.Value)
-            {
-                return (decimal)Convert.ToDecimal(result);
-            }
-            return null;
+            return conn.QuerySingle<decimal?>(@"SELECT unit_price FROM products WHERE id = @productId;", new { productId });
         }
 
         public static void UpdateProductStock(SqliteConnection conn, long productId, long quantity)
         {
-            using var command = conn.CreateCommand();
-            command.CommandText = @"UPDATE products SET stock = stock - @quantity WHERE id = @productId;";
-            command.Parameters.AddWithValue("@productId", productId);
-            command.Parameters.AddWithValue("@quantity", quantity);
-            command.ExecuteNonQuery();
+            conn.Execute(@"UPDATE products SET stock = stock - @quantity WHERE id = @productId;", new { productId, quantity });
         }
     }
 }
