@@ -224,3 +224,6 @@ AppPackages/
 #####
 # End of core ignore list, below put you custom 'per project' settings (patterns or path)
 #####
+
+OrderSystem/obj/Debug/net10.0/OrderSystem.assets.cache
+OrderSystem/obj/Debug/net10.0/OrderSystem.csproj.FileListAbsolute.txt
