@@ -9,17 +9,16 @@ namespace OrderSystem
         public string Name { get; set; } = "";
         public string Email { get; set; } = "";
         public string Phone { get; set; } = "";
-        public string Address { get; set; } = "";
 
         public void Save(SqliteConnection conn)
         {
             try
             {
                 Id = conn.QuerySingle<long>(@"
-                    INSERT INTO customers (name, email, phone, address)
-                    VALUES (@name, @email, @phone, @address)
+                    INSERT INTO customers (name, email, phone)
+                    VALUES (@name, @email, @phone)
                     RETURNING Id;
-                ", new { name = Name, email = Email, phone = Phone, address = Address });
+                ", new { name = Name, email = Email, phone = Phone });
             }
             catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
             {
@@ -81,25 +80,72 @@ namespace OrderSystem
                 }
                 ConsoleHelper.TextColor("⚠️ Phone cannot be empty. And please provide a valid phone number.\n", ConsoleColor.Red);
             }
+            Console.WriteLine();
+            ConsoleHelper.TextColor("--- Address Information ---\n", ConsoleColor.Yellow);
+
+            Address address = new Address();
+
             while (true)
             {
-                Console.Write("Address: ");
+                Console.Write("Street: ");
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
-                if (input.Length >= 5 && input.Length <= 100)
+                if (input.Length >= 3 && input.Length <= 50)
                 {
-                    customer.Address = input; break;
+                    address.Street = input; break;
                 }
-                ConsoleHelper.TextColor("⚠️ Address cannot be empty. And please provide a valid address.\n", ConsoleColor.Red);
+                ConsoleHelper.TextColor("⚠️ Street cannot be empty. And please provide a valid street (between 3 and 50 characters).\n", ConsoleColor.Red);
+            }
+
+            while (true)
+            {
+                Console.Write("City: ");
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
+                if (input.Length >= 2 && input.Length <= 20)
+                {
+                    address.City = input; break;
+                }
+                ConsoleHelper.TextColor("⚠️ City cannot be empty. And please provide a valid city (between 2 and 20 characters).\n", ConsoleColor.Red);
+            }
+
+            while (true)
+            {
+                Console.Write("Zip Code: ");
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
+                if (input.Length >= 3 && input.Length <= 15)
+                {
+                    address.ZipCode = input; break;
+                }
+                ConsoleHelper.TextColor("⚠️ Zip code cannot be empty. And please provide a valid zip code (between 3 and 15 characters).\n", ConsoleColor.Red);
+            }
+
+            while (true)
+            {
+                Console.Write("Country: ");
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
+                if (input.Length >= 2 && input.Length <= 50)
+                {
+                    address.Country = input; break;
+                }
+                ConsoleHelper.TextColor("⚠️ Country cannot be empty. And please provide a valid country (between 2 and 50 characters).\n", ConsoleColor.Red);
             }
 
             customer.Save(conn);
+            address.CustomerId = customer.Id;
+            address.Save(conn);
 
             Console.WriteLine();
             ConsoleHelper.TextColor($"✅ Customer (( {customer.Name} )) created successfully with ID: {customer.Id}\n", ConsoleColor.DarkGreen);
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
+
         }
         public static bool EmailExists(SqliteConnection conn, string email)
         {
@@ -107,3 +153,4 @@ namespace OrderSystem
         }
     }
 }
+
