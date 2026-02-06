@@ -19,7 +19,6 @@ namespace OrderSystem
                     VALUES (@name, @unit_price, @stock)
                     RETURNING Id;
                 ", new { name = Name, unit_price = UnitPrice, stock = Stock });
-
             }
             catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
             {

@@ -59,19 +59,19 @@ namespace OrderSystem
             ");
 
             string[] menu = {
-            ConsoleHelper.CenterText("CREATE CUSTOMER", 15),
-            ConsoleHelper.CenterText("SHOW CUSTOMERS", 15),
-            ConsoleHelper.CenterText("DELETE CUSTOMER", 15),
-            ConsoleHelper.CenterText("CREATE PRODUCT", 15),
-            ConsoleHelper.CenterText("SHOW PRODUCTS", 15),
-            ConsoleHelper.CenterText("DELETE PRODUCT", 15),
-            ConsoleHelper.CenterText("CREATE ORDER", 15),
-            ConsoleHelper.CenterText("SHOW ORDERS", 15),
-            ConsoleHelper.CenterText("DELETE ORDER", 15),
-            ConsoleHelper.CenterText("ADD ORDER ITEM", 15),
-            ConsoleHelper.CenterText("SHOW ORDER ITEMS", 15),
-            ConsoleHelper.CenterText("DELETE ORDER ITEM", 15),
-            ConsoleHelper.CenterText("EXIT", 15)
+            ConsoleHelper.CenterText("CREATE CUSTOMER", 20),
+            ConsoleHelper.CenterText("SHOW CUSTOMERS", 20),
+            ConsoleHelper.CenterText("DELETE CUSTOMER", 20),
+            ConsoleHelper.CenterText("CREATE PRODUCT", 20),
+            ConsoleHelper.CenterText("SHOW PRODUCTS", 20),
+            ConsoleHelper.CenterText("DELETE PRODUCT", 20),
+            ConsoleHelper.CenterText("CREATE ORDER", 20),
+            ConsoleHelper.CenterText("SHOW ORDERS", 20),
+            ConsoleHelper.CenterText("DELETE ORDER", 20),
+            ConsoleHelper.CenterText("ADD ORDER ITEM", 20),
+            ConsoleHelper.CenterText("SHOW ORDER ITEMS", 20),
+            ConsoleHelper.CenterText("DELETE ORDER ITEM", 20),
+            ConsoleHelper.CenterText("EXIT", 20)
              };
             int position = 0;
 
@@ -89,11 +89,11 @@ namespace OrderSystem
                 {
                     if (i == position)
                     {
-                        ConsoleHelper.TextColor(ConsoleHelper.CenterText($">>> {menu[i],-15} <<<", Console.WindowWidth - 1), ConsoleColor.Cyan);
+                        ConsoleHelper.TextColor(ConsoleHelper.CenterText($">>> {menu[i],-20} <<<", Console.WindowWidth - 1), ConsoleColor.Cyan);
                     }
                     else
                     {
-                        ConsoleHelper.TextColor(ConsoleHelper.CenterText($"  {menu[i],-15}  ", Console.WindowWidth - 1), ConsoleColor.DarkGray);
+                        ConsoleHelper.TextColor(ConsoleHelper.CenterText($"  {menu[i],-20}  ", Console.WindowWidth - 1), ConsoleColor.DarkGray);
                     }
                 }
                 var Key = Console.ReadKey(true).Key;

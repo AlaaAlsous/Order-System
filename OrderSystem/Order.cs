@@ -1,3 +1,4 @@
+using Dapper;
 using Microsoft.Data.Sqlite;
 
 namespace OrderSystem
@@ -11,20 +12,14 @@ namespace OrderSystem
 
         public void Save(SqliteConnection conn)
         {
-            using var command = conn.CreateCommand();
-            long unixTime = ((DateTimeOffset)OrderDate).ToUnixTimeSeconds();
-            command.CommandText = @"
-            INSERT INTO orders (customer_id, order_date, status)
-            VALUES (@customer_id, @order_date, @status)
-            RETURNING Id;
-            ";
-            command.Parameters.AddWithValue("@customer_id", CustomerId);
-            command.Parameters.AddWithValue("@order_date", unixTime);
-            command.Parameters.AddWithValue("@status", Status);
-
             try
             {
-                Id = Convert.ToInt64(command.ExecuteScalar());
+                long unixTime = ((DateTimeOffset)OrderDate).ToUnixTimeSeconds();
+                Id = conn.QuerySingle<long>(@"
+                    INSERT INTO orders (customer_id, order_date, status)
+                    VALUES (@customer_id, @order_date, @status)
+                    RETURNING Id;
+                ", new { customer_id = CustomerId, order_date = unixTime, status = Status });
             }
             catch (SqliteException ex)
             {
@@ -107,10 +102,7 @@ namespace OrderSystem
         }
         public static bool CustomerExists(SqliteConnection conn, long customerId)
         {
-            using var command = conn.CreateCommand();
-            command.CommandText = "SELECT EXISTS(SELECT 1 FROM customers WHERE id = @id)";
-            command.Parameters.AddWithValue("@id", customerId);
-            return Convert.ToBoolean(command.ExecuteScalar());
+            return conn.QuerySingle<bool>("SELECT EXISTS(SELECT 1 FROM customers WHERE id = @id)", new { id = customerId });
         }
     }
 }
