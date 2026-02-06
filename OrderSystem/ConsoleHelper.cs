@@ -31,6 +31,12 @@ namespace OrderSystem
             Console.ResetColor();
         }
 
+        public static string GetTablePadding(int tableWidth)
+        {
+            int leftPadding = (Console.WindowWidth - tableWidth) / 2;
+            return leftPadding > 0 ? new string(' ', leftPadding) : "";
+        }
+
         public static string? ReadLineWithEscape()
         {
             string input = "";
