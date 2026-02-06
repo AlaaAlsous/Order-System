@@ -146,7 +146,7 @@ namespace OrderSystem
                     switch (position)
                     {
                         case 0: Customer.Add(database); break;
-                        //case 1: ShowCustomers(database); break;
+                        case 1: ShowCustomers(database); break;
                         //case 2: DeleteCustomer(database); break;
                         case 3: Address.Add(database); break;
                         case 4: Product.Add(database); break;
@@ -178,7 +178,12 @@ namespace OrderSystem
             ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
             Console.WriteLine();
             string separator = new string('-', 152);
+            int tableWidth = separator.Length;
+            string padding = ConsoleHelper.GetTablePadding(tableWidth);
+            
+            Console.Write(padding);
             ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+            Console.Write(padding);
             ConsoleHelper.WriteTableRow(new string[]
             {
                 ConsoleHelper.CenterText("Order", 5),
@@ -192,6 +197,7 @@ namespace OrderSystem
                 ConsoleHelper.CenterText("Unit Price", 10),
                 ConsoleHelper.CenterText("Total Price", 12)
             }, ConsoleColor.Cyan, ConsoleColor.DarkGray);
+            Console.Write(padding);
             ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
 
             foreach (var item in orderItems)
@@ -208,6 +214,7 @@ namespace OrderSystem
                 decimal unitPrice = Convert.ToDecimal(item.unitprice);
                 decimal totalPrice = Convert.ToDecimal(item.totalprice);
 
+                Console.Write(padding);
                 ConsoleHelper.WriteTableRow(new string[]
                 {
                     ConsoleHelper.CenterText(orderId.ToString(), 5),
@@ -221,6 +228,52 @@ namespace OrderSystem
                     ConsoleHelper.CenterText(unitPrice.ToString("F2") + " kr", 10),
                     ConsoleHelper.CenterText(totalPrice.ToString("F2") + " kr", 12)
                 }, ConsoleColor.White, ConsoleColor.DarkGray);
+                Console.Write(padding);
+                ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+            }
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey();
+        }
+
+        public static void ShowCustomers(SqliteConnection conn)
+        {
+            var customers = conn.Query("SELECT * FROM customers");
+            Console.WriteLine();
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("CUSTOMERS", Console.WindowWidth - 1), ConsoleColor.Cyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            Console.WriteLine();
+            string separator = new string('-', 88);
+            int tableWidth = separator.Length + 4;
+            string padding = ConsoleHelper.GetTablePadding(tableWidth);
+            
+            Console.Write(padding);
+            ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+            Console.Write(padding);
+            ConsoleHelper.WriteTableRow(new string[]
+            {
+                ConsoleHelper.CenterText("ID", 5),
+                ConsoleHelper.CenterText("Name", 20),
+                ConsoleHelper.CenterText("Email", 30),
+                ConsoleHelper.CenterText("Phone", 20)
+            }, ConsoleColor.Cyan, ConsoleColor.DarkGray);
+            Console.Write(padding);
+            ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+            foreach (var customer in customers)
+            {
+                long id = customer.Id;
+                string name = customer.name;
+                string email = customer.email;
+                string phone = customer.phone;
+                Console.Write(padding);
+                ConsoleHelper.WriteTableRow(new string[]
+                {
+                    ConsoleHelper.CenterText(id.ToString(), 5),
+                    ConsoleHelper.CenterText(name, 20),
+                    ConsoleHelper.CenterText(email, 30),
+                    ConsoleHelper.CenterText(phone, 20)
+                }, ConsoleColor.White, ConsoleColor.DarkGray);
+                Console.Write(padding);
                 ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
             }
             Console.WriteLine("\nPress any key to continue...");
