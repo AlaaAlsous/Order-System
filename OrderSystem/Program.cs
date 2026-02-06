@@ -20,8 +20,19 @@ namespace OrderSystem
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 email TEXT NOT NULL UNIQUE,
-                phone TEXT,
-                address TEXT
+                phone TEXT
+                );
+            ");
+
+            database.Execute(@"
+                CREATE TABLE IF NOT EXISTS addresses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                customer_id INTEGER NOT NULL,
+                street TEXT NOT NULL,
+                city TEXT NOT NULL,
+                zip_code TEXT NOT NULL,
+                country TEXT NOT NULL,
+                FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
                 );
             ");
 
