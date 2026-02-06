@@ -44,7 +44,11 @@ namespace OrderSystem
                     ConsoleHelper.TextColor("⚠️ Invalid input. Please enter a valid customer ID.\n", ConsoleColor.Red);
                     continue;
                 }
-              
+                if (!Customer.CustomerExists(conn, customerId))
+                {
+                    ConsoleHelper.TextColor($"⚠️ Customer with ID (( {customerId} )) does not exist.\n", ConsoleColor.Red);
+                    continue;
+                }
                 address.CustomerId = customerId;
                 break;
             }

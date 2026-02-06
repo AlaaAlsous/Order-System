@@ -82,9 +82,28 @@ namespace OrderSystem
             }
             Console.WriteLine();
             ConsoleHelper.TextColor("--- Address Information ---\n", ConsoleColor.Yellow);
-
+            
             Address address = new Address();
-
+            
+            while (true)
+            {
+                Console.Write("Address Type [1= Delivery | 2= Billing]: ");
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
+                if (input == "1")
+                {
+                    address.AddressType = "Delivery";
+                    break;
+                }
+                else if (input == "2")
+                {
+                    address.AddressType = "Billing";
+                    break;
+                }
+                ConsoleHelper.TextColor("⚠️ Invalid choice. Please enter 1 for Delivery or 2 for Billing.\n", ConsoleColor.Red);
+            }
+            
             while (true)
             {
                 Console.Write("Street: ");
@@ -97,7 +116,7 @@ namespace OrderSystem
                 }
                 ConsoleHelper.TextColor("⚠️ Street cannot be empty. And please provide a valid street (between 3 and 50 characters).\n", ConsoleColor.Red);
             }
-
+            
             while (true)
             {
                 Console.Write("City: ");
@@ -110,20 +129,20 @@ namespace OrderSystem
                 }
                 ConsoleHelper.TextColor("⚠️ City cannot be empty. And please provide a valid city (between 2 and 20 characters).\n", ConsoleColor.Red);
             }
-
+            
             while (true)
             {
                 Console.Write("Zip Code: ");
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
-                if (input.Length >= 3 && input.Length <= 15)
+                if (input.Length >= 3 && input.Length <= 15 )
                 {
                     address.ZipCode = input; break;
                 }
                 ConsoleHelper.TextColor("⚠️ Zip code cannot be empty. And please provide a valid zip code (between 3 and 15 characters).\n", ConsoleColor.Red);
             }
-
+            
             while (true)
             {
                 Console.Write("Country: ");
@@ -140,7 +159,7 @@ namespace OrderSystem
             customer.Save(conn);
             address.CustomerId = customer.Id;
             address.Save(conn);
-
+            
             Console.WriteLine();
             ConsoleHelper.TextColor($"✅ Customer (( {customer.Name} )) created successfully with ID: {customer.Id}\n", ConsoleColor.DarkGreen);
             Console.WriteLine("Press any key to continue...");
@@ -150,6 +169,11 @@ namespace OrderSystem
         public static bool EmailExists(SqliteConnection conn, string email)
         {
             return conn.QuerySingle<bool>(@"SELECT EXISTS(SELECT 1 FROM customers WHERE email = @email);", new { email });
+        }
+
+        public static bool CustomerExists(SqliteConnection conn, long customerId)
+        {
+            return conn.QuerySingle<bool>("SELECT EXISTS(SELECT 1 FROM customers WHERE id = @id)", new { id = customerId });
         }
     }
 }

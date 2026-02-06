@@ -48,7 +48,7 @@ namespace OrderSystem
                     ConsoleHelper.TextColor("⚠️ Invalid Customer ID. Please enter a valid number.\n", ConsoleColor.Red);
                     continue;
                 }
-                if (!CustomerExists(conn, customerId))
+                if (!Customer.CustomerExists(conn, customerId))
                 {
                     ConsoleHelper.TextColor("⚠️ Customer ID does not exist. Please enter a valid Customer ID.\n", ConsoleColor.Red);
                     continue;
@@ -99,10 +99,6 @@ namespace OrderSystem
             ConsoleHelper.TextColor($"✅ Order (( {order.Id} )) added successfully\n", ConsoleColor.DarkGreen);
             ConsoleHelper.TextColor("Press any key to continue...", ConsoleColor.Gray);
             Console.ReadKey();
-        }
-        public static bool CustomerExists(SqliteConnection conn, long customerId)
-        {
-            return conn.QuerySingle<bool>("SELECT EXISTS(SELECT 1 FROM customers WHERE id = @id)", new { id = customerId });
         }
     }
 }

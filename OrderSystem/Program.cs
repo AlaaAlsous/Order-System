@@ -148,7 +148,7 @@ namespace OrderSystem
                         case 0: Customer.Add(database); break;
                         //case 1: ShowCustomers(database); break;
                         //case 2: DeleteCustomer(database); break;
-                        //case 3: Address.Add(database); break;
+                        case 3: Address.Add(database); break;
                         case 4: Product.Add(database); break;
                         //case 5: ShowProducts(database); break;
                         //case 6: DeleteProduct(database); break;
