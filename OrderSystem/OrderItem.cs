@@ -33,7 +33,7 @@ namespace OrderSystem
             Console.Clear();
             Console.WriteLine();
             ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("ADD ORDER ITEM", Console.WindowWidth - 1), ConsoleColor.Cyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("CREATE ORDER ITEM", Console.WindowWidth - 1), ConsoleColor.Cyan);
             ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
             Console.WriteLine();
 

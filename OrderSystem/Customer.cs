@@ -168,7 +168,7 @@ namespace OrderSystem
         }
         public static bool EmailExists(SqliteConnection conn, string email)
         {
-            return conn.QuerySingle<bool>(@"SELECT EXISTS(SELECT 1 FROM customers WHERE email = @email);", new { email });
+            return conn.QuerySingle<bool>(@"SELECT EXISTS(SELECT 1 FROM customers WHERE email = @email COLLATE NOCASE);", new { email });
         }
 
         public static bool CustomerExists(SqliteConnection conn, long customerId)

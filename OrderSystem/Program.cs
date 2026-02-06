@@ -91,20 +91,28 @@ namespace OrderSystem
             ");
 
             string[] menu = {
-            ConsoleHelper.CenterText("CREATE CUSTOMER", 20),
-            ConsoleHelper.CenterText("SHOW CUSTOMERS", 20),
-            ConsoleHelper.CenterText("DELETE CUSTOMER", 20),
-            ConsoleHelper.CenterText("ADD ADDRESS", 20),
-            ConsoleHelper.CenterText("CREATE PRODUCT", 20),
-            ConsoleHelper.CenterText("SHOW PRODUCTS", 20),
-            ConsoleHelper.CenterText("DELETE PRODUCT", 20),
-            ConsoleHelper.CenterText("CREATE ORDER", 20),
-            ConsoleHelper.CenterText("SHOW ORDERS", 20),
-            ConsoleHelper.CenterText("DELETE ORDER", 20),
-            ConsoleHelper.CenterText("ADD ORDER ITEM", 20),
-            ConsoleHelper.CenterText("SHOW ORDER ITEMS", 20),
-            ConsoleHelper.CenterText("DELETE ORDER ITEM", 20),
-            ConsoleHelper.CenterText("EXIT", 20)
+            ConsoleHelper.CenterText("--- CUSTOMER ---", 25),
+            ConsoleHelper.CenterText("CREATE CUSTOMER", 25),
+            ConsoleHelper.CenterText("SHOW CUSTOMERS", 25),
+            ConsoleHelper.CenterText("DELETE CUSTOMER", 25),
+            ConsoleHelper.CenterText("ADD ADDRESS TO CUSTOMER", 25),
+            "",
+            ConsoleHelper.CenterText("--- PRODUCT ---", 25),
+            ConsoleHelper.CenterText("CREATE PRODUCT", 25),
+            ConsoleHelper.CenterText("SHOW PRODUCTS", 25),
+            ConsoleHelper.CenterText("DELETE PRODUCT", 25),
+            "",
+            ConsoleHelper.CenterText("--- ORDER ---", 25),
+            ConsoleHelper.CenterText("CREATE ORDER", 25),
+            ConsoleHelper.CenterText("SHOW ORDERS", 25),
+            ConsoleHelper.CenterText("DELETE ORDER", 25),
+            "",
+            ConsoleHelper.CenterText("--- ORDER ITEM ---", 25),
+            ConsoleHelper.CenterText("CREATE ORDER ITEM", 25),
+            ConsoleHelper.CenterText("SHOW ORDER ITEMS", 25),
+            ConsoleHelper.CenterText("DELETE ORDER ITEM", 25),
+            "",
+            ConsoleHelper.CenterText("EXIT", 25)
              };
             int position = 0;
 
@@ -116,10 +124,22 @@ namespace OrderSystem
                 ConsoleHelper.TextColor(ConsoleHelper.CenterText("ORDER SYSTEM", Console.WindowWidth - 1), ConsoleColor.Cyan);
                 ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
                 Console.WriteLine();
-                ConsoleHelper.TextColor(ConsoleHelper.CenterText("Use arrow keys to navigate and Enter to select.\n", Console.WindowWidth - 1), ConsoleColor.Blue);
+                ConsoleHelper.TextColor(ConsoleHelper.CenterText("Use ↑ and ↓ arrow keys to navigate and Enter to select.\n", Console.WindowWidth - 1), ConsoleColor.White);
                 Console.CursorVisible = false;
                 for (int i = 0; i < menu.Length; i++)
                 {
+                    if (menu[i] == "")
+                    {
+                        Console.WriteLine();
+                        continue;
+                    }
+
+                    if (menu[i].Contains("---"))
+                    {
+                        ConsoleHelper.TextColor(ConsoleHelper.CenterText(menu[i], Console.WindowWidth - 1), ConsoleColor.Blue);
+                        continue;
+                    }
+
                     if (i == position)
                     {
                         ConsoleHelper.TextColor(ConsoleHelper.CenterText($">>> {menu[i],-20} <<<", Console.WindowWidth - 1), ConsoleColor.Cyan);
@@ -132,33 +152,43 @@ namespace OrderSystem
                 var Key = Console.ReadKey(true).Key;
                 if (Key == ConsoleKey.DownArrow)
                 {
-                    position++;
-                    if (position == menu.Length) position = 0;
+                    do
+                    {
+                        position++;
+                        if (position == menu.Length) position = 0;
+                    } while (menu[position] == "" || menu[position].Contains("---"));
                 }
                 else if (Key == ConsoleKey.UpArrow)
                 {
-                    position--;
-                    if (position < 0) position = menu.Length - 1;
+                    do
+                    {
+                        position--;
+                        if (position < 0) position = menu.Length - 1;
+                    } while (menu[position] == "" || menu[position].Contains("---"));
                 }
                 else if (Key == ConsoleKey.Enter)
                 {
                     Console.Clear();
                     switch (position)
                     {
-                        case 0: Customer.Add(database); break;
-                        case 1: ShowCustomers(database); break;
-                        //case 2: DeleteCustomer(database); break;
-                        case 3: Address.Add(database); break;
-                        case 4: Product.Add(database); break;
-                        //case 5: ShowProducts(database); break;
-                        //case 6: DeleteProduct(database); break;
-                        case 7: Order.Add(database); break;
-                        //case 8: ShowOrders(database); break;
-                        //case 9: DeleteOrder(database); break;
-                        case 10: OrderItem.Add(database); break;
-                        case 11: ShowOrderItems(database); break;
-                        //case 12: DeleteOrderItems(database); break;
-                        case 13:
+                        case 1: Customer.Add(database); break;
+                        case 2: ShowCustomers(database); break;
+                        //case 3: DeleteCustomer(database); break;
+                        case 4: Address.Add(database); break;
+
+                        case 7: Product.Add(database); break;
+                        //case 8: ShowProducts(database); break;
+                        //case 9: DeleteProduct(database); break;
+
+                        case 12: Order.Add(database); break;
+                        //case 13: ShowOrders(database); break;
+                        //case 14: DeleteOrder(database); break;
+
+                        case 17: OrderItem.Add(database); break;
+                        case 18: ShowOrderItems(database); break;
+                        //case 19: DeleteOrderItems(database); break;
+
+                        case 21:
                             Console.WriteLine();
                             ConsoleHelper.TextColor(ConsoleHelper.CenterText("Thank you for choosing the Order System App!\n", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
                             ConsoleHelper.TextColor(ConsoleHelper.CenterText("Press any key to exit...\n", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
@@ -180,7 +210,7 @@ namespace OrderSystem
             string separator = new string('-', 152);
             int tableWidth = separator.Length;
             string padding = ConsoleHelper.GetTablePadding(tableWidth);
-            
+
             Console.Write(padding);
             ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
             Console.Write(padding);
@@ -246,7 +276,7 @@ namespace OrderSystem
             string separator = new string('-', 88);
             int tableWidth = separator.Length + 4;
             string padding = ConsoleHelper.GetTablePadding(tableWidth);
-            
+
             Console.Write(padding);
             ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
             Console.Write(padding);
