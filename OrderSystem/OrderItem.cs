@@ -146,18 +146,26 @@ namespace OrderSystem
             }
             while (true)
             {
-                Console.Write("Price: ");
+                Console.Write("Price [Leave empty to use product price]: ");
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
-                if (!decimal.TryParse(input, out decimal price))
+                if (string.IsNullOrEmpty(input))
+                {
+                    if (orderItem.ProductId.HasValue)
+                    {
+                        var productPrice = GetProductPrice(conn, orderItem.ProductId.Value);
+                        if (productPrice.HasValue && productPrice.Value > 0)
+                        {
+                            orderItem.Price = productPrice.Value;
+                            ConsoleHelper.TextColor($"✓ Using product price: {productPrice.Value:F2} kr\n", ConsoleColor.Green);
+                            break;
+                        }
+                    }
+                }
+                if (!decimal.TryParse(input, out decimal price) || price <= 0)
                 {
                     ConsoleHelper.TextColor("⚠️ Invalid input. Please enter a valid unit price.\n", ConsoleColor.Red);
-                    continue;
-                }
-                if (price <= 0)
-                {
-                    ConsoleHelper.TextColor("⚠️ Price must be greater than 0.\n", ConsoleColor.Red);
                     continue;
                 }
 
