@@ -1,3 +1,4 @@
+using Dapper;
 using Microsoft.Data.Sqlite;
 
 namespace OrderSystem
@@ -11,17 +12,19 @@ namespace OrderSystem
 
         public void Save(SqliteConnection conn)
         {
-            using var command = conn.CreateCommand();
-            command.CommandText = @"
-            INSERT INTO products (name, unit_price, stock)
-            VALUES (@name, @unit_price, @stock)
-            RETURNING Id;
-            ";
-            command.Parameters.AddWithValue("@name", Name);
-            command.Parameters.AddWithValue("@unit_price", UnitPrice);
-            command.Parameters.AddWithValue("@stock", Stock);
+            try
+            {
+                Id = conn.QuerySingle<long>(@"
+                    INSERT INTO products (name, unit_price, stock)
+                    VALUES (@name, @unit_price, @stock)
+                    RETURNING Id;
+                ", new { name = Name, unit_price = UnitPrice, stock = Stock });
 
-            Id = Convert.ToInt64(command.ExecuteScalar());
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
+            {
+                throw new InvalidOperationException("⚠️ A product with this name already exists. Please use a different name.", ex);
+            }
         }
         public static void Add(SqliteConnection conn)
         {
@@ -40,12 +43,18 @@ namespace OrderSystem
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
-                if (input.Length >= 2 && input.Length <= 15)
+                if (input.Length < 2 || input.Length > 20)
                 {
-                    product.Name = input;
-                    break;
+                    ConsoleHelper.TextColor("⚠️ Name cannot be empty. Please enter a valid name (between 2 and 20 characters).\n", ConsoleColor.Red);
+                    continue;
                 }
-                ConsoleHelper.TextColor("⚠️ Name cannot be empty. Please enter a valid name (between 2 and 20 characters).\n", ConsoleColor.Red);
+                if (CheckName(conn, input))
+                {
+                    ConsoleHelper.TextColor("⚠️ A product with this name already exists. Please enter a different name.\n", ConsoleColor.Red);
+                    continue;
+                }
+                product.Name = input;
+                break;
             }
             while (true)
             {
@@ -78,6 +87,11 @@ namespace OrderSystem
             ConsoleHelper.TextColor($"✅ Product (( {product.Name} )) created successfully with ID: {product.Id}\n", ConsoleColor.DarkGreen);
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
+        }
+
+        public static bool CheckName(SqliteConnection conn, string name)
+        {
+            return conn.QuerySingle<bool>(@"SELECT EXISTS(SELECT 1 FROM products WHERE name = @name COLLATE NOCASE);", new { name });
         }
     }
 }
