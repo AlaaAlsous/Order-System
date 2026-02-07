@@ -105,6 +105,56 @@ namespace OrderSystem
             Console.ReadKey();
         }
 
+        public static void ShowOrders(SqliteConnection conn)
+        {
+            var orders = conn.Query(@"SELECT orderid, customerid, customername, orderdate, status FROM order_overview");
+            Console.Clear();
+            Console.WriteLine();
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("ORDERS", Console.WindowWidth - 1), ConsoleColor.Cyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            Console.WriteLine();
+            string separator = new string('-', 111);
+            int tableWidth = separator.Length + 4;
+            string padding = ConsoleHelper.GetTablePadding(tableWidth);
+
+            Console.Write(padding);
+            ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+            Console.Write(padding);
+            ConsoleHelper.WriteTableRow(new string[]
+            {
+                ConsoleHelper.CenterText("ID", 5),
+                ConsoleHelper.CenterText("Customer ID", 20),
+                ConsoleHelper.CenterText("Customer Name", 20),
+                ConsoleHelper.CenterText("Order Date", 30),
+                ConsoleHelper.CenterText("Status", 20)
+            }, ConsoleColor.Cyan, ConsoleColor.DarkGray);
+            Console.Write(padding);
+            ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+            foreach (var order in orders)
+            {
+                long id = order.orderid;
+                long customerId = order.customerid;
+                string customerName = order.customername;
+                DateTime orderDate = DateTimeOffset.FromUnixTimeSeconds(order.orderdate).UtcDateTime;
+                string status = order.status;
+                Console.Write(padding);
+                ConsoleHelper.WriteTableRow(new string[]
+                {
+                    ConsoleHelper.CenterText(id.ToString(), 5),
+                    ConsoleHelper.CenterText(customerId.ToString(), 20),
+                    ConsoleHelper.CenterText(customerName, 20),
+                    ConsoleHelper.CenterText(orderDate.ToString("yyyy-MM-dd"), 30),
+                    ConsoleHelper.CenterText(status, 20)
+                }, ConsoleColor.White, ConsoleColor.DarkGray);
+                Console.Write(padding);
+                ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+            }
+
+            ConsoleHelper.TextColor("Press any key to continue...", ConsoleColor.Gray);
+            Console.ReadKey();
+        }
+
         public bool Delete(SqliteConnection conn)
         {
             try
@@ -143,7 +193,7 @@ namespace OrderSystem
                     ConsoleHelper.TextColor($"⚠️ Order with ID (( {orderId} )) does not exist.\n", ConsoleColor.Red);
                     continue;
                 }
-                
+
                 Order order = new Order { Id = orderId };
                 if (order.Delete(conn))
                 {
