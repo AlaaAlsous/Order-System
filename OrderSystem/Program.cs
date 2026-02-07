@@ -133,13 +133,13 @@ namespace OrderSystem
                         Console.WriteLine();
                         continue;
                     }
-
+                    
                     if (menu[i].Contains("---"))
                     {
                         ConsoleHelper.TextColor(ConsoleHelper.CenterText(menu[i], Console.WindowWidth - 1), ConsoleColor.Blue);
                         continue;
                     }
-
+                    
                     if (i == position)
                     {
                         ConsoleHelper.TextColor(ConsoleHelper.CenterText($">>> {menu[i],-20} <<<", Console.WindowWidth - 1), ConsoleColor.Cyan);
@@ -172,8 +172,8 @@ namespace OrderSystem
                     switch (position)
                     {
                         case 1: Customer.Add(database); break;
-                        case 2: ShowCustomers(database); break;
-                        //case 3: DeleteCustomer(database); break;
+                        case 2: Customer.ShowCustomers(database); break;
+                        case 3: Customer.DeleteCustomer(database); break;
                         case 4: Address.Add(database); break;
 
                         case 7: Product.Add(database); break;
@@ -182,10 +182,10 @@ namespace OrderSystem
 
                         case 12: Order.Add(database); break;
                         //case 13: ShowOrders(database); break;
-                        //case 14: DeleteOrder(database); break;
+                        case 14: Order.DeleteOrder(database); break;
 
                         case 17: OrderItem.Add(database); break;
-                        case 18: ShowOrderItems(database); break;
+                        case 18: OrderItem.ShowOrderItems(database); break;
                         //case 19: DeleteOrderItems(database); break;
 
                         case 21:
@@ -197,117 +197,6 @@ namespace OrderSystem
                     }
                 }
             }
-        }
-        public static void ShowOrderItems(SqliteConnection conn)
-        {
-            var orderItems = conn.Query("SELECT * FROM order_overview");
-
-            Console.WriteLine();
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("ORDER OVERVIEW", Console.WindowWidth - 1), ConsoleColor.Cyan);
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
-            Console.WriteLine();
-            string separator = new string('-', 152);
-            int tableWidth = separator.Length;
-            string padding = ConsoleHelper.GetTablePadding(tableWidth);
-
-            Console.Write(padding);
-            ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
-            Console.Write(padding);
-            ConsoleHelper.WriteTableRow(new string[]
-            {
-                ConsoleHelper.CenterText("Order", 5),
-                ConsoleHelper.CenterText("Customer", 20),
-                ConsoleHelper.CenterText("Date", 10),
-                ConsoleHelper.CenterText("Status", 9),
-                ConsoleHelper.CenterText("Item ID", 7),
-                ConsoleHelper.CenterText("Product", 15),
-                ConsoleHelper.CenterText("Description", 25),
-                ConsoleHelper.CenterText("Quantity", 8),
-                ConsoleHelper.CenterText("Unit Price", 10),
-                ConsoleHelper.CenterText("Total Price", 12)
-            }, ConsoleColor.Cyan, ConsoleColor.DarkGray);
-            Console.Write(padding);
-            ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
-
-            foreach (var item in orderItems)
-            {
-                long orderId = item.orderid;
-                string customerName = item.customername;
-                long orderDateUnix = item.orderdate;
-                DateTime orderDate = DateTimeOffset.FromUnixTimeSeconds(orderDateUnix).DateTime;
-                string status = item.status;
-                long orderItemId = item.orderitemid;
-                string productName = item.productname ?? "";
-                string description = item.description ?? "";
-                long quantity = item.quantity;
-                decimal unitPrice = Convert.ToDecimal(item.unitprice);
-                decimal totalPrice = Convert.ToDecimal(item.totalprice);
-
-                Console.Write(padding);
-                ConsoleHelper.WriteTableRow(new string[]
-                {
-                    ConsoleHelper.CenterText(orderId.ToString(), 5),
-                    ConsoleHelper.CenterText(customerName, 20),
-                    ConsoleHelper.CenterText(orderDate.ToString("yyyy-MM-dd"), 10),
-                    ConsoleHelper.CenterText(status, 9),
-                    ConsoleHelper.CenterText(orderItemId.ToString(), 7),
-                    ConsoleHelper.CenterText(productName, 15),
-                    ConsoleHelper.CenterText(description, 25),
-                    ConsoleHelper.CenterText(quantity.ToString(), 8),
-                    ConsoleHelper.CenterText(unitPrice.ToString("F2") + " kr", 10),
-                    ConsoleHelper.CenterText(totalPrice.ToString("F2") + " kr", 12)
-                }, ConsoleColor.White, ConsoleColor.DarkGray);
-                Console.Write(padding);
-                ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
-            }
-            Console.WriteLine("\nPress any key to continue...");
-            Console.ReadKey();
-        }
-
-        public static void ShowCustomers(SqliteConnection conn)
-        {
-            var customers = conn.Query("SELECT * FROM customers");
-            Console.WriteLine();
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("CUSTOMERS", Console.WindowWidth - 1), ConsoleColor.Cyan);
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
-            Console.WriteLine();
-            string separator = new string('-', 88);
-            int tableWidth = separator.Length + 4;
-            string padding = ConsoleHelper.GetTablePadding(tableWidth);
-
-            Console.Write(padding);
-            ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
-            Console.Write(padding);
-            ConsoleHelper.WriteTableRow(new string[]
-            {
-                ConsoleHelper.CenterText("ID", 5),
-                ConsoleHelper.CenterText("Name", 20),
-                ConsoleHelper.CenterText("Email", 30),
-                ConsoleHelper.CenterText("Phone", 20)
-            }, ConsoleColor.Cyan, ConsoleColor.DarkGray);
-            Console.Write(padding);
-            ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
-            foreach (var customer in customers)
-            {
-                long id = customer.Id;
-                string name = customer.name;
-                string email = customer.email;
-                string phone = customer.phone;
-                Console.Write(padding);
-                ConsoleHelper.WriteTableRow(new string[]
-                {
-                    ConsoleHelper.CenterText(id.ToString(), 5),
-                    ConsoleHelper.CenterText(name, 20),
-                    ConsoleHelper.CenterText(email, 30),
-                    ConsoleHelper.CenterText(phone, 20)
-                }, ConsoleColor.White, ConsoleColor.DarkGray);
-                Console.Write(padding);
-                ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
-            }
-            Console.WriteLine("\nPress any key to continue...");
-            Console.ReadKey();
         }
     }
 }

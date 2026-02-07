@@ -13,13 +13,22 @@ namespace OrderSystem
         public string ZipCode { get; set; } = "";
         public string Country { get; set; } = "";
 
-        public void Save(SqliteConnection conn)
+        public bool Save(SqliteConnection conn)
         {
-            Id = conn.QuerySingle<long>(@"
-                INSERT INTO addresses (customer_id, address_type, street, city, zip_code, country)
-                VALUES (@customerId, @addressType, @street, @city, @zipCode, @country)
-                RETURNING id;
-            ", new { customerId = CustomerId, addressType = AddressType, street = Street, city = City, zipCode = ZipCode, country = Country });
+            try
+            {
+                Id = conn.QuerySingle<long>(@"
+                    INSERT INTO addresses (customer_id, address_type, street, city, zip_code, country)
+                    VALUES (@customerId, @addressType, @street, @city, @zipCode, @country)
+                    RETURNING id;
+                ", new { customerId = CustomerId, addressType = AddressType, street = Street, city = City, zipCode = ZipCode, country = Country });
+                return true;
+            }
+            catch (SqliteException ex)
+            {
+                ConsoleHelper.TextColor($"⚠️ Failed to add address. Error: {ex.Message}\n", ConsoleColor.Red);
+                return false;
+            }
         }
 
         public static void Add(SqliteConnection conn)
@@ -128,10 +137,12 @@ namespace OrderSystem
                 ConsoleHelper.TextColor("⚠️ Country cannot be empty. And please provide a valid country (between 2 and 50 characters).\n", ConsoleColor.Red);
             }
 
-            address.Save(conn);
-
-            Console.WriteLine();
-            ConsoleHelper.TextColor($"✅ {address.AddressType} address (( {address.Id} )) added successfully for Customer ID {address.CustomerId}\n", ConsoleColor.DarkGreen);
+            if (address.Save(conn))
+            {
+                Console.WriteLine();
+                ConsoleHelper.TextColor($"✅ {address.AddressType} address (( {address.Id} )) added successfully for Customer ID {address.CustomerId}\n", ConsoleColor.DarkGreen);
+            }
+            
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
         }

@@ -10,7 +10,7 @@ namespace OrderSystem
         public decimal UnitPrice { get; set; }
         public long Stock { get; set; }
 
-        public void Save(SqliteConnection conn)
+        public bool Save(SqliteConnection conn)
         {
             try
             {
@@ -19,10 +19,12 @@ namespace OrderSystem
                     VALUES (@name, @unit_price, @stock)
                     RETURNING Id;
                 ", new { name = Name, unit_price = UnitPrice, stock = Stock });
+                return true;
             }
-            catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
+            catch (SqliteException ex)
             {
-                throw new InvalidOperationException("⚠️ A product with this name already exists. Please use a different name.", ex);
+                ConsoleHelper.TextColor($"⚠️ Failed to create product. Error: {ex.Message}\n", ConsoleColor.Red);
+                return false;
             }
         }
         public static void Add(SqliteConnection conn)
@@ -80,10 +82,12 @@ namespace OrderSystem
                 ConsoleHelper.TextColor("⚠️ Invalid input. Please enter a valid stock quantity.\n", ConsoleColor.Red);
             }
 
-            product.Save(conn);
-
-            Console.WriteLine();
-            ConsoleHelper.TextColor($"✅ Product (( {product.Name} )) created successfully with ID: {product.Id}\n", ConsoleColor.DarkGreen);
+            if (product.Save(conn))
+            {
+                Console.WriteLine();
+                ConsoleHelper.TextColor($"✅ Product (( {product.Name} )) created successfully with ID: {product.Id}\n", ConsoleColor.DarkGreen);
+            }
+            
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
         }
@@ -91,6 +95,11 @@ namespace OrderSystem
         public static bool CheckName(SqliteConnection conn, string name)
         {
             return conn.QuerySingle<bool>(@"SELECT EXISTS(SELECT 1 FROM products WHERE name = @name COLLATE NOCASE);", new { name });
+        }
+
+        public static bool ProductExists(SqliteConnection conn, long productId)
+        {
+            return conn.QuerySingle<bool>("SELECT EXISTS(SELECT 1 FROM products WHERE id = @productId)", new { productId });
         }
     }
 }

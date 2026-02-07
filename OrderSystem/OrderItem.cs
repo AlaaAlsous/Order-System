@@ -12,7 +12,7 @@ namespace OrderSystem
         public long Quantity { get; set; }
         public decimal Price { get; set; }
 
-        public void Save(SqliteConnection conn)
+        public bool Save(SqliteConnection conn)
         {
             try
             {
@@ -21,10 +21,12 @@ namespace OrderSystem
                 VALUES (@order_id, @product_id, @description, @quantity, @unit_price)
                 RETURNING Id;
             ", new { order_id = OrderId, product_id = ProductId, description = Description, quantity = Quantity, unit_price = Price });
+                return true;
             }
             catch (SqliteException ex)
             {
-                throw new InvalidOperationException("⚠️ Failed to add order item. Please ensure all fields are valid.", ex);
+                ConsoleHelper.TextColor($"⚠️ Failed to add order item. Error: {ex.Message}\n", ConsoleColor.Red);
+                return false;
             }
         }
 
@@ -75,7 +77,7 @@ namespace OrderSystem
                     ConsoleHelper.TextColor("⚠️ Invalid input. Please enter a valid number.\n", ConsoleColor.Red);
                     continue;
                 }
-                if (!ProductExists(conn, productId))
+                if (!Product.ProductExists(conn, productId))
                 {
                     ConsoleHelper.TextColor($"⚠️ Product with ID (( {productId} )) does not exist. Please enter a valid Product ID.\n", ConsoleColor.Red);
                     continue;
@@ -173,26 +175,91 @@ namespace OrderSystem
                 break;
             }
 
-            orderItem.Save(conn);
-
-            if (orderItem.ProductId.HasValue)
+            if (orderItem.Save(conn))
             {
-                UpdateProductStock(conn, orderItem.ProductId.Value, orderItem.Quantity);
-            }
+                if (orderItem.ProductId.HasValue)
+                {
+                    UpdateProductStock(conn, orderItem.ProductId.Value, orderItem.Quantity);
+                }
 
-            Console.WriteLine();
-            ConsoleHelper.TextColor($"✅ Order item (( {orderItem.Id} )) added successfully\n", ConsoleColor.DarkGreen);
+                Console.WriteLine();
+                ConsoleHelper.TextColor($"✅ Order item (( {orderItem.Id} )) added successfully\n", ConsoleColor.DarkGreen);
+            }
+            
             ConsoleHelper.TextColor("Press any key to continue...", ConsoleColor.Gray);
+            Console.ReadKey();
+        }
+
+        public static void ShowOrderItems(SqliteConnection conn)
+        {
+            var orderItems = conn.Query("SELECT * FROM order_overview");
+
+            Console.Clear();
+            Console.WriteLine();
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("ORDER OVERVIEW", Console.WindowWidth - 1), ConsoleColor.Cyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            Console.WriteLine();
+            string separator = new string('-', 152);
+            int tableWidth = separator.Length;
+            string padding = ConsoleHelper.GetTablePadding(tableWidth);
+
+            Console.Write(padding);
+            ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+            Console.Write(padding);
+            ConsoleHelper.WriteTableRow(new string[]
+            {
+                ConsoleHelper.CenterText("Order", 5),
+                ConsoleHelper.CenterText("Customer", 20),
+                ConsoleHelper.CenterText("Date", 10),
+                ConsoleHelper.CenterText("Status", 9),
+                ConsoleHelper.CenterText("Item ID", 7),
+                ConsoleHelper.CenterText("Product", 15),
+                ConsoleHelper.CenterText("Description", 25),
+                ConsoleHelper.CenterText("Quantity", 8),
+                ConsoleHelper.CenterText("Unit Price", 10),
+                ConsoleHelper.CenterText("Total Price", 12)
+            }, ConsoleColor.Cyan, ConsoleColor.DarkGray);
+            Console.Write(padding);
+            ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+
+            foreach (var item in orderItems)
+            {
+                long orderId = item.orderid;
+                string customerName = item.customername;
+                long orderDateUnix = item.orderdate;
+                DateTime orderDate = DateTimeOffset.FromUnixTimeSeconds(orderDateUnix).DateTime;
+                string status = item.status;
+                long orderItemId = item.orderitemid;
+                string productName = item.productname ?? "";
+                string description = item.description ?? "";
+                long quantity = item.quantity;
+                decimal unitPrice = Convert.ToDecimal(item.unitprice);
+                decimal totalPrice = Convert.ToDecimal(item.totalprice);
+
+                Console.Write(padding);
+                ConsoleHelper.WriteTableRow(new string[]
+                {
+                    ConsoleHelper.CenterText(orderId.ToString(), 5),
+                    ConsoleHelper.CenterText(customerName, 20),
+                    ConsoleHelper.CenterText(orderDate.ToString("yyyy-MM-dd"), 10),
+                    ConsoleHelper.CenterText(status, 9),
+                    ConsoleHelper.CenterText(orderItemId.ToString(), 7),
+                    ConsoleHelper.CenterText(productName, 15),
+                    ConsoleHelper.CenterText(description, 25),
+                    ConsoleHelper.CenterText(quantity.ToString(), 8),
+                    ConsoleHelper.CenterText(unitPrice.ToString("F2") + " kr", 10),
+                    ConsoleHelper.CenterText(totalPrice.ToString("F2") + " kr", 12)
+                }, ConsoleColor.White, ConsoleColor.DarkGray);
+                Console.Write(padding);
+                ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+            }
+            Console.WriteLine("\nPress any key to continue...");
             Console.ReadKey();
         }
         public static bool OrderExists(SqliteConnection conn, long orderId)
         {
             return conn.QuerySingle<bool>(@"SELECT EXISTS(SELECT 1 FROM orders WHERE id = @orderId);", new { orderId });
-        }
-
-        public static bool ProductExists(SqliteConnection conn, long productId)
-        {
-            return conn.QuerySingle<bool>(@"SELECT EXISTS(SELECT 1 FROM products WHERE id = @productId);", new { productId });
         }
 
         public static long? GetProductStock(SqliteConnection conn, long productId)
