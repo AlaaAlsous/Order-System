@@ -10,7 +10,7 @@ namespace OrderSystem
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
         public string Status { get; set; } = "Created";
 
-        public void Save(SqliteConnection conn)
+        public bool Save(SqliteConnection conn)
         {
             try
             {
@@ -20,10 +20,12 @@ namespace OrderSystem
                     VALUES (@customer_id, @order_date, @status)
                     RETURNING Id;
                 ", new { customer_id = CustomerId, order_date = unixTime, status = Status });
+                return true;
             }
             catch (SqliteException ex)
             {
-                throw new InvalidOperationException("⚠️ Failed to create order. Please ensure the Customer ID exists.\n", ex);
+                ConsoleHelper.TextColor($"⚠️ Failed to create order. Error: {ex.Message}\n", ConsoleColor.Red);
+                return false;
             }
         }
 
@@ -93,12 +95,70 @@ namespace OrderSystem
                 ConsoleHelper.TextColor("⚠️ Invalid status. Please enter 'Created', 'Paid', or 'Delivered'.\n", ConsoleColor.Red);
             }
 
-            order.Save(conn);
+            if (order.Save(conn))
+            {
+                Console.WriteLine();
+                ConsoleHelper.TextColor($"✅ Order (( {order.Id} )) added successfully\n", ConsoleColor.DarkGreen);
+            }
 
-            Console.WriteLine();
-            ConsoleHelper.TextColor($"✅ Order (( {order.Id} )) added successfully\n", ConsoleColor.DarkGreen);
             ConsoleHelper.TextColor("Press any key to continue...", ConsoleColor.Gray);
             Console.ReadKey();
         }
+
+        public bool Delete(SqliteConnection conn)
+        {
+            try
+            {
+                conn.Execute("DELETE FROM orders WHERE Id = @id", new { id = Id });
+                return true;
+            }
+            catch (SqliteException ex)
+            {
+                ConsoleHelper.TextColor($"⚠️ Failed to delete order ID: {Id}. Error: {ex.Message}\n", ConsoleColor.Red);
+                return false;
+            }
+        }
+
+        public static void DeleteOrder(SqliteConnection conn)
+        {
+            Console.Clear();
+            Console.WriteLine();
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("DELETE ORDER", Console.WindowWidth - 1), ConsoleColor.Cyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            Console.WriteLine();
+            while (true)
+            {
+                Console.Write("Order ID to delete: ");
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
+                if (!long.TryParse(input, out long orderId) || orderId <= 0)
+                {
+                    ConsoleHelper.TextColor("⚠️ Invalid Order ID. Please enter a valid number.\n", ConsoleColor.Red);
+                    continue;
+                }
+                if (!OrderExists(conn, orderId))
+                {
+                    ConsoleHelper.TextColor($"⚠️ Order with ID (( {orderId} )) does not exist.\n", ConsoleColor.Red);
+                    continue;
+                }
+                
+                Order order = new Order { Id = orderId };
+                if (order.Delete(conn))
+                {
+                    Console.WriteLine();
+                    ConsoleHelper.TextColor($"✅ Order (( {orderId} )) deleted successfully\n", ConsoleColor.DarkGreen);
+                }
+                break;
+            }
+            ConsoleHelper.TextColor("Press any key to continue...", ConsoleColor.Gray);
+            Console.ReadKey();
+        }
+        public static bool OrderExists(SqliteConnection conn, long orderId)
+        {
+            return conn.QuerySingle<bool>("SELECT EXISTS(SELECT 1 FROM orders WHERE id = @orderId)", new { orderId });
+        }
+
     }
 }
