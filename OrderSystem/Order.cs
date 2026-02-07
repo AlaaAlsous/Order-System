@@ -107,7 +107,17 @@ namespace OrderSystem
 
         public static void ShowOrders(SqliteConnection conn)
         {
-            var orders = conn.Query(@"SELECT orderid, customerid, customername, orderdate, status FROM order_overview");
+            var orders = conn.Query(@"
+                SELECT 
+                    orders.id AS orderid,
+                    orders.customer_id AS customerid,
+                    customers.name AS customername,
+                    orders.order_date AS orderdate,
+                    orders.status AS status
+                FROM orders
+                JOIN customers ON orders.customer_id = customers.id
+                ORDER BY orders.id
+            ");
             Console.Clear();
             Console.WriteLine();
             ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
