@@ -32,10 +32,13 @@ namespace OrderSystem
         {
             Console.Clear();
             Console.WriteLine();
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("CREATE PRODUCT", Console.WindowWidth - 1), ConsoleColor.Cyan);
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("╔═════════════════════════════════════╗", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("║                                     ║", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("║            CREATE PRODUCT           ║", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("║                                     ║", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("╚═════════════════════════════════════╝", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
             Console.WriteLine();
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("Press ESC any time to cancel\n", Console.WindowWidth - 1), ConsoleColor.DarkGray);
 
             Product product = new Product();
 
@@ -98,9 +101,11 @@ namespace OrderSystem
             var products = conn.Query<Product>("SELECT id AS Id, name AS Name, unit_price AS UnitPrice, stock AS Stock FROM products ORDER BY name");
             Console.Clear();
             Console.WriteLine();
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("PRODUCTS", Console.WindowWidth - 1), ConsoleColor.Cyan);
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("╔═════════════════════════════════════╗", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("║                                     ║", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("║               PRODUCTS              ║", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("║                                     ║", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("╚═════════════════════════════════════╝", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
             Console.WriteLine();
 
             string separator = new string('-', 88);
@@ -123,7 +128,7 @@ namespace OrderSystem
             if (!products.Any())
             {
                 Console.WriteLine();
-                ConsoleHelper.TextColor(ConsoleHelper.CenterText("No Products found.\n", Console.WindowWidth - 1), ConsoleColor.Yellow);
+                ConsoleHelper.TextColor(ConsoleHelper.CenterText("⚠️ No Products found.\n", Console.WindowWidth - 1), ConsoleColor.Yellow);
             }
             foreach (var product in products)
             {
@@ -164,10 +169,14 @@ namespace OrderSystem
         {
             Console.Clear();
             Console.WriteLine();
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("DELETE PRODUCT", Console.WindowWidth - 1), ConsoleColor.Cyan);
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("╔═════════════════════════════════════╗", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("║                                     ║", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("║            DELETE PRODUCT           ║", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("║                                     ║", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("╚═════════════════════════════════════╝", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
             Console.WriteLine();
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("Press ESC any time to cancel\n", Console.WindowWidth - 1), ConsoleColor.DarkGray);
+
             while (true)
             {
                 Console.Write("Product ID to delete: ");
@@ -193,7 +202,8 @@ namespace OrderSystem
                 }
                 break;
             }
-            ConsoleHelper.TextColor("Press any key to continue...", ConsoleColor.Gray);
+
+            ConsoleHelper.TextColor("\nPress any key to continue...", ConsoleColor.Gray);
             Console.ReadKey();
         }
 
