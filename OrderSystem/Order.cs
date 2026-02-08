@@ -179,6 +179,82 @@ namespace OrderSystem
             Console.ReadKey();
         }
 
+        public bool UpdateStatus(SqliteConnection conn, string newStatus)
+        {
+            try
+            {
+                conn.Execute("UPDATE orders SET status = @status WHERE Id = @id", new { status = newStatus, id = Id });
+                return true;
+            }
+            catch (SqliteException ex)
+            {
+                ConsoleHelper.TextColor($"⚠️ Failed to update order ID: {Id}. Error: {ex.Message}\n", ConsoleColor.Red);
+                return false;
+            }
+        }
+
+        public static void UpdateOrderStatus(SqliteConnection conn)
+        {
+            Console.Clear();
+            Console.WriteLine();
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("UPDATE ORDER STATUS", Console.WindowWidth - 1), ConsoleColor.Cyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            Console.WriteLine();
+            while (true)
+            {
+                Console.Write("Order ID to update: ");
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
+                if (!long.TryParse(input, out long orderId) || orderId <= 0)
+                {
+                    ConsoleHelper.TextColor("⚠️ Invalid Order ID. Please enter a valid number.\n", ConsoleColor.Red);
+                    continue;
+                }
+                if (!OrderExists(conn, orderId))
+                {
+                    ConsoleHelper.TextColor($"⚠️ Order with ID (( {orderId} )) does not exist.\n", ConsoleColor.Red);
+                    continue;
+                }
+                Order order = new Order { Id = orderId };
+                while (true)
+                {
+                    Console.Write("New Status [1= Created | 2= Paid | 3= Delivered]: ");
+                    var statusInput = ConsoleHelper.ReadLineWithEscape();
+                    if (statusInput == null) return;
+                    statusInput = statusInput.Trim();
+                    if (statusInput == "1")
+                    {
+                        statusInput = "Created";
+                    }
+                    else if (statusInput == "2")
+                    {
+                        statusInput = "Paid";
+                    }
+                    else if (statusInput == "3")
+                    {
+                        statusInput = "Delivered";
+                    }
+                    else
+                    {
+                        ConsoleHelper.TextColor("⚠️ Invalid status. Please choose 'Created', 'Paid', or 'Delivered'.\n", ConsoleColor.Red);
+                        continue;
+                    }
+                    if (order.UpdateStatus(conn, statusInput))
+                    {
+                        Console.WriteLine();
+                        ConsoleHelper.TextColor($"✅ Order (( {orderId} )) status updated to '{statusInput}' successfully\n", ConsoleColor.DarkGreen);
+                    }
+                    break;
+                }
+
+                ConsoleHelper.TextColor("Press any key to continue...", ConsoleColor.Gray);
+                Console.ReadKey();
+                break;
+            }
+        }
+
         public bool Delete(SqliteConnection conn)
         {
             try

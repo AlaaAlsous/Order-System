@@ -106,6 +106,7 @@ namespace OrderSystem
             ConsoleHelper.CenterText("--- ORDER ---", 25),
             ConsoleHelper.CenterText("CREATE ORDER", 25),
             ConsoleHelper.CenterText("SHOW ORDERS", 25),
+            ConsoleHelper.CenterText("UPDATE ORDER STATUS", 25),
             ConsoleHelper.CenterText("DELETE ORDER", 25),
             "",
             ConsoleHelper.CenterText("--- ORDER ITEM ---", 25),
@@ -184,13 +185,14 @@ namespace OrderSystem
 
                         case 13: Order.Add(database); break;
                         case 14: Order.ShowOrders(database); break;
-                        case 15: Order.DeleteOrder(database); break;
+                        case 15: Order.UpdateOrderStatus(database); break;
+                        case 16: Order.DeleteOrder(database); break;
 
-                        case 18: OrderItem.Add(database); break;
-                        case 19: OrderItem.ShowOrderItems(database); break;
-                        case 20: OrderItem.DeleteOrderItem(database); break;
+                        case 19: OrderItem.Add(database); break;
+                        case 20: OrderItem.ShowOrderItems(database); break;
+                        case 21: OrderItem.DeleteOrderItem(database); break;
 
-                        case 22:
+                        case 23:
                             Console.WriteLine();
                             ConsoleHelper.TextColor(ConsoleHelper.CenterText("Thank you for choosing the Order System App!\n", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
                             ConsoleHelper.TextColor(ConsoleHelper.CenterText("Press any key to exit...\n", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
