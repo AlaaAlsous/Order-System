@@ -146,6 +146,57 @@ namespace OrderSystem
             Console.ReadKey();
         }
 
+        public bool Delete(SqliteConnection conn)
+        {
+            try
+            {
+                conn.Execute("DELETE FROM products WHERE id = @id", new { id = Id });
+                return true;
+            }
+            catch (SqliteException ex)
+            {
+                ConsoleHelper.TextColor($"⚠️ Failed to delete product. Error: {ex.Message}\n", ConsoleColor.Red);
+                return false;
+            }
+        }
+
+        public static void DeleteProduct(SqliteConnection conn)
+        {
+            Console.Clear();
+            Console.WriteLine();
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("DELETE PRODUCT", Console.WindowWidth - 1), ConsoleColor.Cyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            Console.WriteLine();
+            while (true)
+            {
+                Console.Write("Product ID to delete: ");
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
+                if (!long.TryParse(input, out long productId) || productId <= 0)
+                {
+                    ConsoleHelper.TextColor("⚠️ Invalid Product ID. Please enter a valid number.\n", ConsoleColor.Red);
+                    continue;
+                }
+                if (!ProductExists(conn, productId))
+                {
+                    ConsoleHelper.TextColor($"⚠️ Product with ID (( {productId} )) does not exist.\n", ConsoleColor.Red);
+                    continue;
+                }
+
+                Product product = new Product { Id = productId };
+                if (product.Delete(conn))
+                {
+                    Console.WriteLine();
+                    ConsoleHelper.TextColor($"✅ Product (( {productId} )) deleted successfully\n", ConsoleColor.DarkGreen);
+                }
+                break;
+            }
+            ConsoleHelper.TextColor("Press any key to continue...", ConsoleColor.Gray);
+            Console.ReadKey();
+        }
+
         public static bool CheckName(SqliteConnection conn, string name)
         {
             return conn.QuerySingle<bool>(@"SELECT EXISTS(SELECT 1 FROM products WHERE name = @name COLLATE NOCASE);", new { name });
