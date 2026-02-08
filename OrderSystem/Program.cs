@@ -74,7 +74,7 @@ namespace OrderSystem
                 CREATE VIEW IF NOT EXISTS order_overview AS
                 SELECT 
                     orders.id AS orderid,
-                    customers.id AS customerid,
+                    customers.Id AS customerid,
                     customers.name AS customername,
                     orders.order_date AS orderdate,
                     orders.status AS status,
@@ -85,7 +85,7 @@ namespace OrderSystem
                     order_rows.unit_price AS unitprice,
                     (order_rows.quantity * order_rows.unit_price) AS totalprice
                 FROM orders 
-                    JOIN customers ON orders.customer_id = customers.id
+                    JOIN customers ON orders.customer_id = customers.Id
                     JOIN order_rows ON orders.id = order_rows.order_id
                     LEFT JOIN products ON order_rows.product_id = products.id;
             ");
@@ -178,7 +178,7 @@ namespace OrderSystem
 
                         case 7: Product.Add(database); break;
                         case 8: Product.ShowProducts(database); break;
-                        //case 9: DeleteProduct(database); break;
+                        case 9: Product.DeleteProduct(database); break;
 
                         case 12: Order.Add(database); break;
                         case 13: Order.ShowOrders(database); break;
@@ -186,7 +186,7 @@ namespace OrderSystem
 
                         case 17: OrderItem.Add(database); break;
                         case 18: OrderItem.ShowOrderItems(database); break;
-                        //case 19: DeleteOrderItems(database); break;
+                        case 19: OrderItem.DeleteOrderItem(database); break;
 
                         case 21:
                             Console.WriteLine();

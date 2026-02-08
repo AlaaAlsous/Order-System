@@ -186,14 +186,14 @@ namespace OrderSystem
                 Console.WriteLine();
                 ConsoleHelper.TextColor($"✅ Order item (( {orderItem.Id} )) added successfully\n", ConsoleColor.DarkGreen);
             }
-
+            
             ConsoleHelper.TextColor("Press any key to continue...", ConsoleColor.Gray);
             Console.ReadKey();
         }
 
         public static void ShowOrderItems(SqliteConnection conn)
         {
-            var orderItems = conn.Query("SELECT * FROM order_overview");
+            var orderItems = conn.Query("SELECT * FROM order_overview ORDER BY orderitemid");
 
             Console.Clear();
             Console.WriteLine();
@@ -210,11 +210,11 @@ namespace OrderSystem
             Console.Write(padding);
             ConsoleHelper.WriteTableRow(new string[]
             {
+                ConsoleHelper.CenterText("Item ID", 7),
                 ConsoleHelper.CenterText("Order", 5),
                 ConsoleHelper.CenterText("Customer", 20),
                 ConsoleHelper.CenterText("Date", 10),
                 ConsoleHelper.CenterText("Status", 9),
-                ConsoleHelper.CenterText("Item ID", 7),
                 ConsoleHelper.CenterText("Product", 15),
                 ConsoleHelper.CenterText("Description", 25),
                 ConsoleHelper.CenterText("Quantity", 8),
@@ -247,11 +247,11 @@ namespace OrderSystem
                 Console.Write(padding);
                 ConsoleHelper.WriteTableRow(new string[]
                 {
+                    ConsoleHelper.CenterText(orderItemId.ToString(), 7),
                     ConsoleHelper.CenterText(orderId.ToString(), 5),
                     ConsoleHelper.CenterText(customerName, 20),
                     ConsoleHelper.CenterText(orderDate.ToString("yyyy-MM-dd"), 10),
                     ConsoleHelper.CenterText(status, 9),
-                    ConsoleHelper.CenterText(orderItemId.ToString(), 7),
                     ConsoleHelper.CenterText(productName, 15),
                     ConsoleHelper.CenterText(description, 25),
                     ConsoleHelper.CenterText(quantity.ToString(), 8),
@@ -262,6 +262,57 @@ namespace OrderSystem
                 ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
             }
             Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey();
+        }
+
+        public bool Delete(SqliteConnection conn)
+        {
+            try
+            {
+                conn.Execute(@"DELETE FROM order_rows WHERE id = @id;", new { id = Id });
+                return true;
+            }
+            catch (SqliteException ex)
+            {
+                ConsoleHelper.TextColor($"⚠️ Failed to delete order item. Error: {ex.Message}\n", ConsoleColor.Red);
+                return false;
+            }
+        }
+
+        public static void DeleteOrderItem(SqliteConnection conn)
+        {
+            Console.Clear();
+            Console.WriteLine();
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("DELETE ORDER ITEM", Console.WindowWidth - 1), ConsoleColor.Cyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            Console.WriteLine();
+            while (true)
+            {
+                Console.Write("Order Item ID to delete: ");
+                var input = ConsoleHelper.ReadLineWithEscape();
+                if (input == null) return;
+                input = input.Trim();
+                if (!long.TryParse(input, out long orderItemId) || orderItemId <= 0)
+                {
+                    ConsoleHelper.TextColor("⚠️ Invalid Order Item ID. Please enter a valid number.\n", ConsoleColor.Red);
+                    continue;
+                }
+                if (!OrderItemExists(conn, orderItemId))
+                {
+                    ConsoleHelper.TextColor($"⚠️ Order Item with ID (( {orderItemId} )) does not exist.\n", ConsoleColor.Red);
+                    continue;
+                }
+
+                OrderItem orderItem = new OrderItem { Id = orderItemId };
+                if (orderItem.Delete(conn))
+                {
+                    Console.WriteLine();
+                    ConsoleHelper.TextColor($"✅ Order Item (( {orderItemId} )) deleted successfully\n", ConsoleColor.DarkGreen);
+                }
+                break;
+            }
+            ConsoleHelper.TextColor("Press any key to continue...", ConsoleColor.Gray);
             Console.ReadKey();
         }
         public static bool OrderExists(SqliteConnection conn, long orderId)
@@ -282,6 +333,11 @@ namespace OrderSystem
         public static void UpdateProductStock(SqliteConnection conn, long productId, long quantity)
         {
             conn.Execute(@"UPDATE products SET stock = stock - @quantity WHERE id = @productId;", new { productId, quantity });
+        }
+
+        public static bool OrderItemExists(SqliteConnection conn, long orderItemId)
+        {
+            return conn.QuerySingle<bool>(@"SELECT EXISTS(SELECT 1 FROM order_rows WHERE id = @orderItemId);", new { orderItemId });
         }
     }
 }
