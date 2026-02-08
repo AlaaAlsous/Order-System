@@ -85,7 +85,7 @@ namespace OrderSystem
                     order_rows.unit_price AS unitprice,
                     (order_rows.quantity * order_rows.unit_price) AS totalprice
                 FROM orders 
-                    JOIN customers ON orders.customer_id = customers.Id
+                    JOIN customers ON orders.customer_id = customers.id
                     JOIN order_rows ON orders.id = order_rows.order_id
                     LEFT JOIN products ON order_rows.product_id = products.id;
             ");
@@ -133,13 +133,13 @@ namespace OrderSystem
                         Console.WriteLine();
                         continue;
                     }
-                    
+
                     if (menu[i].Contains("---"))
                     {
                         ConsoleHelper.TextColor(ConsoleHelper.CenterText(menu[i], Console.WindowWidth - 1), ConsoleColor.Blue);
                         continue;
                     }
-                    
+
                     if (i == position)
                     {
                         ConsoleHelper.TextColor(ConsoleHelper.CenterText($">>> {menu[i],-20} <<<", Console.WindowWidth - 1), ConsoleColor.Cyan);
@@ -177,11 +177,11 @@ namespace OrderSystem
                         case 4: Address.Add(database); break;
 
                         case 7: Product.Add(database); break;
-                        //case 8: ShowProducts(database); break;
+                        case 8: Product.ShowProducts(database); break;
                         //case 9: DeleteProduct(database); break;
 
                         case 12: Order.Add(database); break;
-                        //case 13: ShowOrders(database); break;
+                        case 13: Order.ShowOrders(database); break;
                         case 14: Order.DeleteOrder(database); break;
 
                         case 17: OrderItem.Add(database); break;

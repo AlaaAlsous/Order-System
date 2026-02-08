@@ -1,5 +1,6 @@
 using Dapper;
 using Microsoft.Data.Sqlite;
+using System.Globalization;
 
 namespace OrderSystem
 {
@@ -90,7 +91,7 @@ namespace OrderSystem
                 var productPrice = GetProductPrice(conn, productId);
                 if (productPrice.HasValue)
                 {
-                    ConsoleHelper.TextColor($"📢 Product unit price: {productPrice.Value:F2} kr", ConsoleColor.DarkYellow);
+                    ConsoleHelper.TextColor($"📢 Product unit price: {productPrice.Value.ToString("C2", CultureInfo.CurrentCulture)}", ConsoleColor.DarkYellow);
                 }
                 orderItem.ProductId = productId;
                 break;
@@ -160,7 +161,7 @@ namespace OrderSystem
                         if (productPrice.HasValue && productPrice.Value > 0)
                         {
                             orderItem.Price = productPrice.Value;
-                            ConsoleHelper.TextColor($"✓ Using product price: {productPrice.Value:F2} kr\n", ConsoleColor.Green);
+                            ConsoleHelper.TextColor($"✓ Using product price: {productPrice.Value.ToString("C2", CultureInfo.CurrentCulture)}\n", ConsoleColor.Green);
                             break;
                         }
                     }
@@ -185,7 +186,7 @@ namespace OrderSystem
                 Console.WriteLine();
                 ConsoleHelper.TextColor($"✅ Order item (( {orderItem.Id} )) added successfully\n", ConsoleColor.DarkGreen);
             }
-            
+
             ConsoleHelper.TextColor("Press any key to continue...", ConsoleColor.Gray);
             Console.ReadKey();
         }
@@ -223,6 +224,12 @@ namespace OrderSystem
             Console.Write(padding);
             ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
 
+            if (!orderItems.Any())
+            {
+                Console.WriteLine();
+                ConsoleHelper.TextColor(ConsoleHelper.CenterText("No Order Items found.\n", Console.WindowWidth - 1), ConsoleColor.Yellow);
+            }
+
             foreach (var item in orderItems)
             {
                 long orderId = item.orderid;
@@ -248,8 +255,8 @@ namespace OrderSystem
                     ConsoleHelper.CenterText(productName, 15),
                     ConsoleHelper.CenterText(description, 25),
                     ConsoleHelper.CenterText(quantity.ToString(), 8),
-                    ConsoleHelper.CenterText(unitPrice.ToString("F2") + " kr", 10),
-                    ConsoleHelper.CenterText(totalPrice.ToString("F2") + " kr", 12)
+                    ConsoleHelper.CenterText(unitPrice.ToString("C2", CultureInfo.CurrentCulture), 10),
+                    ConsoleHelper.CenterText(totalPrice.ToString("C2", CultureInfo.CurrentCulture), 12)
                 }, ConsoleColor.White, ConsoleColor.DarkGray);
                 Console.Write(padding);
                 ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);

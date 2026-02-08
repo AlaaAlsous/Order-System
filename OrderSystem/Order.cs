@@ -141,6 +141,13 @@ namespace OrderSystem
             }, ConsoleColor.Cyan, ConsoleColor.DarkGray);
             Console.Write(padding);
             ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+
+            if (!orders.Any())
+            {
+                Console.WriteLine();
+                ConsoleHelper.TextColor(ConsoleHelper.CenterText("No Orders found.\n", Console.WindowWidth - 1), ConsoleColor.Yellow);
+            }
+
             foreach (var order in orders)
             {
                 long id = order.orderid;

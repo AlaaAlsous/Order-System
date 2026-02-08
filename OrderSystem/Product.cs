@@ -1,5 +1,6 @@
 using Dapper;
 using Microsoft.Data.Sqlite;
+using System.Globalization;
 
 namespace OrderSystem
 {
@@ -87,8 +88,61 @@ namespace OrderSystem
                 Console.WriteLine();
                 ConsoleHelper.TextColor($"✅ Product (( {product.Name} )) created successfully with ID: {product.Id}\n", ConsoleColor.DarkGreen);
             }
-            
+
             Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
+
+        public static void ShowProducts(SqliteConnection conn)
+        {
+            var products = conn.Query<Product>("SELECT id AS Id, name AS Name, unit_price AS UnitPrice, stock AS Stock FROM products ORDER BY name");
+            Console.Clear();
+            Console.WriteLine();
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("PRODUCTS", Console.WindowWidth - 1), ConsoleColor.Cyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            Console.WriteLine();
+
+            string separator = new string('-', 88);
+            int tableWidth = separator.Length + 4;
+            string padding = ConsoleHelper.GetTablePadding(tableWidth);
+
+            Console.Write(padding);
+            ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+            Console.Write(padding);
+            ConsoleHelper.WriteTableRow(new string[]
+            {
+                ConsoleHelper.CenterText("ID", 5),
+                ConsoleHelper.CenterText("Name", 30),
+                ConsoleHelper.CenterText("Unit Price", 20),
+                ConsoleHelper.CenterText("Stock", 20)
+            }, ConsoleColor.Cyan, ConsoleColor.DarkGray);
+            Console.Write(padding);
+            ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+
+            if (!products.Any())
+            {
+                Console.WriteLine();
+                ConsoleHelper.TextColor(ConsoleHelper.CenterText("No Products found.\n", Console.WindowWidth - 1), ConsoleColor.Yellow);
+            }
+            foreach (var product in products)
+            {
+                long id = product.Id;
+                string name = product.Name;
+                string unitPrice = product.UnitPrice.ToString("C2", CultureInfo.CurrentCulture);
+                string stock = product.Stock.ToString();
+                Console.Write(padding);
+                ConsoleHelper.WriteTableRow(new string[]
+                {
+                    ConsoleHelper.CenterText(id.ToString(), 5),
+                    ConsoleHelper.CenterText(name, 30),
+                    ConsoleHelper.CenterText(unitPrice, 20),
+                    ConsoleHelper.CenterText(stock, 20)
+                }, ConsoleColor.White, ConsoleColor.DarkGray);
+                Console.Write(padding);
+                ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+            }
+            Console.WriteLine("\nPress any key to continue...");
             Console.ReadKey();
         }
 

@@ -174,13 +174,14 @@ namespace OrderSystem
         }
         public static void ShowCustomers(SqliteConnection conn)
         {
-            var customers = conn.Query("SELECT * FROM customers");
+            var customers = conn.Query("SELECT * FROM customers ORDER BY name ASC");
             Console.Clear();
             Console.WriteLine();
             ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
             ConsoleHelper.TextColor(ConsoleHelper.CenterText("CUSTOMERS", Console.WindowWidth - 1), ConsoleColor.Cyan);
             ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
             Console.WriteLine();
+
             string separator = new string('-', 88);
             int tableWidth = separator.Length + 4;
             string padding = ConsoleHelper.GetTablePadding(tableWidth);
@@ -197,6 +198,13 @@ namespace OrderSystem
             }, ConsoleColor.Cyan, ConsoleColor.DarkGray);
             Console.Write(padding);
             ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+
+            if (!customers.Any())
+            {
+                Console.WriteLine();
+                ConsoleHelper.TextColor(ConsoleHelper.CenterText("No Customers found.\n", Console.WindowWidth - 1), ConsoleColor.Yellow);
+            }
+
             foreach (var customer in customers)
             {
                 long id = customer.Id;
@@ -298,4 +306,3 @@ namespace OrderSystem
         }
     }
 }
-
