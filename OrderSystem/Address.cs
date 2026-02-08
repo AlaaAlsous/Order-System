@@ -35,10 +35,13 @@ namespace OrderSystem
         {
             Console.Clear();
             Console.WriteLine();
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("ADD ADDRESS TO CUSTOMER", Console.WindowWidth - 1), ConsoleColor.Cyan);
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("╔═════════════════════════════════════╗", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("║                                     ║", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("║       ADD ADDRESS TO CUSTOMER       ║", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("║                                     ║", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("╚═════════════════════════════════════╝", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
             Console.WriteLine();
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("Press ESC any time to cancel\n", Console.WindowWidth - 1), ConsoleColor.DarkGray);
 
             Address address = new Address();
 
@@ -140,10 +143,9 @@ namespace OrderSystem
             if (address.Save(conn))
             {
                 Console.WriteLine();
-                ConsoleHelper.TextColor($"✅ {address.AddressType} address (( {address.Id} )) added successfully for Customer ID {address.CustomerId}\n", ConsoleColor.DarkGreen);
+                ConsoleHelper.TextColor($"✅ {address.AddressType} address (( {address.Id} )) added successfully for Customer ID {address.CustomerId}", ConsoleColor.DarkGreen);
             }
-
-            Console.WriteLine("Press any key to continue...");
+            Console.WriteLine("\nPress any key to continue...");
             Console.ReadKey();
         }
 
@@ -157,9 +159,11 @@ namespace OrderSystem
             ");
             Console.Clear();
             Console.WriteLine();
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("ADDRESSES", Console.WindowWidth - 1), ConsoleColor.Cyan);
-            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("╔═════════════════════════════════════╗", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("║                                     ║", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("║              ADDRESSES              ║", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("║                                     ║", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("╚═════════════════════════════════════╝", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
             Console.WriteLine();
 
             string separator = new string('-', 139);
