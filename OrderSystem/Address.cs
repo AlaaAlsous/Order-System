@@ -142,8 +142,79 @@ namespace OrderSystem
                 Console.WriteLine();
                 ConsoleHelper.TextColor($"✅ {address.AddressType} address (( {address.Id} )) added successfully for Customer ID {address.CustomerId}\n", ConsoleColor.DarkGreen);
             }
-            
+
             Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
+
+        public static void ShowAddresses(SqliteConnection conn)
+        {
+            var addresses = conn.Query(@"
+                SELECT *,  customers.name AS customer_name
+                FROM addresses
+                JOIN customers ON addresses.customer_id = customers.Id
+                ORDER BY customer_id ASC
+            ");
+            Console.Clear();
+            Console.WriteLine();
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("ADDRESSES", Console.WindowWidth - 1), ConsoleColor.Cyan);
+            ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+            Console.WriteLine();
+
+            string separator = new string('-', 139);
+            int tableWidth = separator.Length;
+            string padding = ConsoleHelper.GetTablePadding(tableWidth);
+
+            Console.Write(padding);
+            ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+            Console.Write(padding);
+            ConsoleHelper.WriteTableRow(new string[]
+            {
+                ConsoleHelper.CenterText("ID", 5),
+                ConsoleHelper.CenterText("Customer ID", 12),
+                ConsoleHelper.CenterText("Customer Name", 15),
+                ConsoleHelper.CenterText("Address Type", 15),
+                ConsoleHelper.CenterText("Street", 25),
+                ConsoleHelper.CenterText("City", 15),
+                ConsoleHelper.CenterText("Zip Code", 12),
+                ConsoleHelper.CenterText("Country", 15)
+            }, ConsoleColor.Cyan, ConsoleColor.DarkGray);
+            Console.Write(padding);
+            ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+
+            if (!addresses.Any())
+            {
+                Console.WriteLine();
+                ConsoleHelper.TextColor(ConsoleHelper.CenterText("No Addresses found.\n", Console.WindowWidth - 1), ConsoleColor.Yellow);
+            }
+
+            foreach (var address in addresses)
+            {
+                long id = address.id;
+                long customerId = address.customer_id;
+                string customerName = address.customer_name;
+                string addressType = address.address_type;
+                string street = address.street;
+                string city = address.city;
+                string zipCode = address.zip_code;
+                string country = address.country;
+                Console.Write(padding);
+                ConsoleHelper.WriteTableRow(new string[]
+                {
+                    ConsoleHelper.CenterText(id.ToString(), 5),
+                    ConsoleHelper.CenterText(customerId.ToString(), 12),
+                    ConsoleHelper.CenterText(customerName, 15),
+                    ConsoleHelper.CenterText(addressType, 15),
+                    ConsoleHelper.CenterText(street, 25),
+                    ConsoleHelper.CenterText(city, 15),
+                    ConsoleHelper.CenterText(zipCode, 12),
+                    ConsoleHelper.CenterText(country, 15)
+                }, ConsoleColor.White, ConsoleColor.DarkGray);
+                Console.Write(padding);
+                ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
+            }
+            Console.WriteLine("\nPress any key to continue...");
             Console.ReadKey();
         }
     }

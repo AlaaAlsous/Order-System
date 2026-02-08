@@ -96,6 +96,7 @@ namespace OrderSystem
             ConsoleHelper.CenterText("SHOW CUSTOMERS", 25),
             ConsoleHelper.CenterText("DELETE CUSTOMER", 25),
             ConsoleHelper.CenterText("ADD ADDRESS TO CUSTOMER", 25),
+            ConsoleHelper.CenterText("SHOW ADDRESSES", 25),
             "",
             ConsoleHelper.CenterText("--- PRODUCT ---", 25),
             ConsoleHelper.CenterText("CREATE PRODUCT", 25),
@@ -133,13 +134,13 @@ namespace OrderSystem
                         Console.WriteLine();
                         continue;
                     }
-
+                    
                     if (menu[i].Contains("---"))
                     {
                         ConsoleHelper.TextColor(ConsoleHelper.CenterText(menu[i], Console.WindowWidth - 1), ConsoleColor.Blue);
                         continue;
                     }
-
+                    
                     if (i == position)
                     {
                         ConsoleHelper.TextColor(ConsoleHelper.CenterText($">>> {menu[i],-20} <<<", Console.WindowWidth - 1), ConsoleColor.Cyan);
@@ -175,20 +176,21 @@ namespace OrderSystem
                         case 2: Customer.ShowCustomers(database); break;
                         case 3: Customer.DeleteCustomer(database); break;
                         case 4: Address.Add(database); break;
+                        case 5: Address.ShowAddresses(database); break;
 
-                        case 7: Product.Add(database); break;
-                        case 8: Product.ShowProducts(database); break;
-                        case 9: Product.DeleteProduct(database); break;
+                        case 8: Product.Add(database); break;
+                        case 9: Product.ShowProducts(database); break;
+                        case 10: Product.DeleteProduct(database); break;
 
-                        case 12: Order.Add(database); break;
-                        case 13: Order.ShowOrders(database); break;
-                        case 14: Order.DeleteOrder(database); break;
+                        case 13: Order.Add(database); break;
+                        case 14: Order.ShowOrders(database); break;
+                        case 15: Order.DeleteOrder(database); break;
 
-                        case 17: OrderItem.Add(database); break;
-                        case 18: OrderItem.ShowOrderItems(database); break;
-                        case 19: OrderItem.DeleteOrderItem(database); break;
+                        case 18: OrderItem.Add(database); break;
+                        case 19: OrderItem.ShowOrderItems(database); break;
+                        case 20: OrderItem.DeleteOrderItem(database); break;
 
-                        case 21:
+                        case 22:
                             Console.WriteLine();
                             ConsoleHelper.TextColor(ConsoleHelper.CenterText("Thank you for choosing the Order System App!\n", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
                             ConsoleHelper.TextColor(ConsoleHelper.CenterText("Press any key to exit...\n", Console.WindowWidth - 1), ConsoleColor.DarkCyan);

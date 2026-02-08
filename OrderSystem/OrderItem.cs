@@ -201,7 +201,7 @@ namespace OrderSystem
             ConsoleHelper.TextColor(ConsoleHelper.CenterText("ORDER ITEMS", Console.WindowWidth - 1), ConsoleColor.Cyan);
             ConsoleHelper.TextColor(ConsoleHelper.CenterText("═══════════════════════════════════════", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
             Console.WriteLine();
-            string separator = new string('-', 152);
+            string separator = new string('-', 153);
             int tableWidth = separator.Length;
             string padding = ConsoleHelper.GetTablePadding(tableWidth);
 
@@ -216,10 +216,10 @@ namespace OrderSystem
                 ConsoleHelper.CenterText("Date", 10),
                 ConsoleHelper.CenterText("Status", 9),
                 ConsoleHelper.CenterText("Product", 15),
-                ConsoleHelper.CenterText("Description", 25),
+                ConsoleHelper.CenterText("Description", 20),
                 ConsoleHelper.CenterText("Quantity", 8),
-                ConsoleHelper.CenterText("Unit Price", 10),
-                ConsoleHelper.CenterText("Total Price", 12)
+                ConsoleHelper.CenterText("Unit Price", 14),
+                ConsoleHelper.CenterText("Total Price", 14)
             }, ConsoleColor.Cyan, ConsoleColor.DarkGray);
             Console.Write(padding);
             ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
@@ -253,10 +253,10 @@ namespace OrderSystem
                     ConsoleHelper.CenterText(orderDate.ToString("yyyy-MM-dd"), 10),
                     ConsoleHelper.CenterText(status, 9),
                     ConsoleHelper.CenterText(productName, 15),
-                    ConsoleHelper.CenterText(description, 25),
+                    ConsoleHelper.CenterText(description, 20),
                     ConsoleHelper.CenterText(quantity.ToString(), 8),
-                    ConsoleHelper.CenterText(unitPrice.ToString("C2", CultureInfo.CurrentCulture), 10),
-                    ConsoleHelper.CenterText(totalPrice.ToString("C2", CultureInfo.CurrentCulture), 12)
+                    ConsoleHelper.CenterText(unitPrice.ToString("C2", CultureInfo.CurrentCulture), 14),
+                    ConsoleHelper.CenterText(totalPrice.ToString("C2", CultureInfo.CurrentCulture), 14)
                 }, ConsoleColor.White, ConsoleColor.DarkGray);
                 Console.Write(padding);
                 ConsoleHelper.TextColor(separator, ConsoleColor.DarkGray);
