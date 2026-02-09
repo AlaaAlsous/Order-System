@@ -196,7 +196,7 @@ namespace OrderSystem
 
         public static void ShowOrderItems(SqliteConnection conn)
         {
-            var orderItems = conn.Query("SELECT * FROM order_overview ORDER BY orderitemid");
+            var orderItems = conn.Query("SELECT * FROM order_overview WHERE orderitemid IS NOT NULL ORDER BY orderitemid");
 
             Console.Clear();
             Console.WriteLine();

@@ -113,17 +113,15 @@ namespace OrderSystem
         {
             var orders = conn.Query(@"
                 SELECT 
-                    orders.id AS orderid,
-                    orders.customer_id AS customerid,
-                    customers.name AS customername,
-                    orders.order_date AS orderdate,
-                    orders.status AS status,
-                    sum(order_rows.quantity * order_rows.unit_price) AS total
-                FROM orders
-                JOIN customers ON orders.customer_id = customers.id
-                LEFT JOIN order_rows ON orders.id = order_rows.order_id
-                GROUP BY orders.id, customers.id
-                ORDER BY orders.id
+                    orderid,
+                    customerid,
+                    customername,
+                    orderdate,
+                    status,
+                    sum(totalprice) AS total
+                FROM order_overview
+                GROUP BY orderid, customerid
+                ORDER BY orderid
             ");
             Console.Clear();
             Console.WriteLine();
