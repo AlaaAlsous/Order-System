@@ -61,6 +61,8 @@ namespace OrderSystem
                     ConsoleHelper.TextColor($"⚠️ Order with ID (( {orderId} )) does not exist. Please enter a valid Order ID.\n", ConsoleColor.Red);
                     continue;
                 }
+                var customerName = Customer.GetCustomerName(conn, orderId);
+                ConsoleHelper.TextColor($"📢 Adding order item for customer: {customerName}\n", ConsoleColor.DarkYellow);
                 orderItem.OrderId = orderId;
                 break;
             }
@@ -86,6 +88,8 @@ namespace OrderSystem
                     ConsoleHelper.TextColor($"⚠️ Product with ID (( {productId} )) does not exist. Please enter a valid Product ID.\n", ConsoleColor.Red);
                     continue;
                 }
+                var productName = Product.GetProductName(conn, productId);
+                ConsoleHelper.TextColor($"📢 Selected product: {productName}", ConsoleColor.DarkYellow);
                 availableStock = GetProductStock(conn, productId);
                 if (availableStock.HasValue)
                 {
@@ -164,7 +168,7 @@ namespace OrderSystem
                         if (productPrice.HasValue && productPrice.Value > 0)
                         {
                             orderItem.Price = productPrice.Value;
-                            ConsoleHelper.TextColor($"✅ Using product price: {productPrice.Value.ToString("C2", CultureInfo.CurrentCulture)}\n", ConsoleColor.DarkYellow);
+                            ConsoleHelper.TextColor($"✅ Using product price: {productPrice.Value.ToString("C2", CultureInfo.CurrentCulture)}", ConsoleColor.DarkYellow);
                             break;
                         }
                     }
@@ -189,7 +193,7 @@ namespace OrderSystem
                 Console.WriteLine();
                 ConsoleHelper.TextColor($"✅ Order item (( {orderItem.Id} )) added successfully\n", ConsoleColor.DarkGreen);
             }
-            
+
             ConsoleHelper.TextColor("Press any key to continue...", ConsoleColor.Gray);
             Console.ReadKey();
         }
@@ -312,7 +316,18 @@ namespace OrderSystem
                     ConsoleHelper.TextColor($"⚠️ Order Item with ID (( {orderItemId} )) does not exist.\n", ConsoleColor.Red);
                     continue;
                 }
-
+                var orderId = conn.QuerySingle<long>("SELECT order_id FROM order_rows WHERE id = @orderItemId", new { orderItemId });
+                var customerId = conn.QuerySingle<long>("SELECT customer_id FROM orders WHERE id = @orderId", new { orderId });
+                var customerName = Customer.GetCustomerName(conn, customerId);
+                ConsoleHelper.TextColor($"⚠️ Are you sure you want to delete order item for customer (( {customerName} ))? (y/n):", ConsoleColor.DarkYellow);
+                Console.Write("Answer: ");
+                var deletechoice = ConsoleHelper.ReadLineWithEscape();
+                if (deletechoice == null) return;
+                if (deletechoice.Trim().ToLower() != "y" && deletechoice.Trim().ToLower() != "yes")
+                {
+                    ConsoleHelper.TextColor("❎ Deletion cancelled.\n", ConsoleColor.Red);
+                    break;
+                }
                 OrderItem orderItem = new OrderItem { Id = orderItemId };
                 if (orderItem.Delete(conn))
                 {

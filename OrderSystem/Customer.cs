@@ -272,7 +272,6 @@ namespace OrderSystem
                     ConsoleHelper.TextColor($"⚠️ Customer with ID (( {customerId} )) does not exist.\n", ConsoleColor.Red);
                     continue;
                 }
-
                 if (HasOrders(conn, customerId))
                 {
                     ConsoleHelper.TextColor($"⚠️ Cannot delete customer with ID: {customerId} because they have associated orders. Please delete the orders first.\n", ConsoleColor.Red);
@@ -280,20 +279,26 @@ namespace OrderSystem
                     Console.ReadKey();
                     return;
                 }
+                var customerName = Customer.GetCustomerName(conn, customerId);
+                ConsoleHelper.TextColor($"⚠️ Are you sure you want to delete customer (( {customerName} ))? (y/n):", ConsoleColor.DarkYellow);
+                Console.Write("Answer: ");
+                var deletechoice = ConsoleHelper.ReadLineWithEscape();
+                if (deletechoice == null) return;
+                if (deletechoice.Trim().ToLower() != "y" && deletechoice.Trim().ToLower() != "yes")
+                {
+                    ConsoleHelper.TextColor("❎ Deletion cancelled.\n", ConsoleColor.Red);
+                    break;
+                }
                 Customer customer = new Customer { Id = customerId };
-
-
                 if (customer.Delete(conn))
                 {
                     Console.WriteLine();
                     ConsoleHelper.TextColor($"✅ Customer with ID: {customerId} deleted successfully.\n", ConsoleColor.DarkGreen);
                 }
-
-                Console.WriteLine("Press any key to continue...");
-                Console.ReadKey();
                 break;
             }
-
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
 
         public static bool EmailExists(SqliteConnection conn, string email)

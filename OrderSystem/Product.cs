@@ -193,7 +193,16 @@ namespace OrderSystem
                     ConsoleHelper.TextColor($"⚠️ Product with ID (( {productId} )) does not exist.\n", ConsoleColor.Red);
                     continue;
                 }
-
+                var productName = GetProductName(conn, productId);
+                ConsoleHelper.TextColor($"⚠️ Are you sure you want to delete product (( {productName} ))? (y/n):", ConsoleColor.DarkYellow);
+                Console.Write("Answer: ");
+                var deletechoice = ConsoleHelper.ReadLineWithEscape();
+                if (deletechoice == null) return;
+                if (deletechoice.Trim().ToLower() != "y" && deletechoice.Trim().ToLower() != "yes")
+                {
+                    ConsoleHelper.TextColor("❎ Deletion cancelled.\n", ConsoleColor.Red);
+                    break;
+                }
                 Product product = new Product { Id = productId };
                 if (product.Delete(conn))
                 {
@@ -203,7 +212,7 @@ namespace OrderSystem
                 break;
             }
 
-            ConsoleHelper.TextColor("\nPress any key to continue...", ConsoleColor.Gray);
+            ConsoleHelper.TextColor("Press any key to continue...", ConsoleColor.Gray);
             Console.ReadKey();
         }
 
@@ -215,6 +224,11 @@ namespace OrderSystem
         public static bool ProductExists(SqliteConnection conn, long productId)
         {
             return conn.QuerySingle<bool>("SELECT EXISTS(SELECT 1 FROM products WHERE id = @productId)", new { productId });
+        }
+
+        public static string GetProductName(SqliteConnection conn, long productId)
+        {
+            return conn.QuerySingle<string>("SELECT name FROM products WHERE id = @productId", new { productId }) ?? "Unknown Product";
         }
     }
 }

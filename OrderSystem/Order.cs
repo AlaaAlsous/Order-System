@@ -59,6 +59,8 @@ namespace OrderSystem
                     ConsoleHelper.TextColor("⚠️ Customer ID does not exist. Please enter a valid Customer ID.\n", ConsoleColor.Red);
                     continue;
                 }
+                var customerName = Customer.GetCustomerName(conn, customerId);
+                ConsoleHelper.TextColor($"📢 Adding order for customer: {customerName}\n", ConsoleColor.DarkYellow);
                 order.CustomerId = customerId;
                 break;
             }
@@ -224,6 +226,10 @@ namespace OrderSystem
                     ConsoleHelper.TextColor($"⚠️ Order with ID (( {orderId} )) does not exist.\n", ConsoleColor.Red);
                     continue;
                 }
+                var customerId = conn.QuerySingle<long>("SELECT customer_id FROM orders WHERE id = @orderId", new { orderId });
+                var customerName = Customer.GetCustomerName(conn, customerId);
+                var orderStatus = GetOrderStatus(conn, orderId);
+                ConsoleHelper.TextColor($"📢 Updating order for customer: {customerName} (Current Status: {orderStatus})\n", ConsoleColor.DarkYellow);
                 Order order = new Order { Id = orderId };
                 while (true)
                 {
@@ -304,7 +310,17 @@ namespace OrderSystem
                     ConsoleHelper.TextColor($"⚠️ Order with ID (( {orderId} )) does not exist.\n", ConsoleColor.Red);
                     continue;
                 }
-
+                var customerId = conn.QuerySingle<long>("SELECT customer_id FROM orders WHERE id = @orderId", new { orderId });
+                var customerName = Customer.GetCustomerName(conn, customerId);
+                ConsoleHelper.TextColor($"⚠️ Are you sure you want to delete order for customer (( {customerName} ))? (y/n):", ConsoleColor.DarkYellow);
+                Console.Write("Answer: ");
+                var deletechoice = ConsoleHelper.ReadLineWithEscape();
+                if (deletechoice == null) return;
+                if (deletechoice.Trim().ToLower() != "y" && deletechoice.Trim().ToLower() != "yes")
+                {
+                    ConsoleHelper.TextColor("❎ Deletion cancelled.\n", ConsoleColor.Red);
+                    break;
+                }
                 Order order = new Order { Id = orderId };
                 if (order.Delete(conn))
                 {
@@ -321,5 +337,10 @@ namespace OrderSystem
             return conn.QuerySingle<bool>("SELECT EXISTS(SELECT 1 FROM orders WHERE id = @orderId)", new { orderId });
         }
 
+        public static string GetOrderStatus(SqliteConnection conn, long orderId)
+        {
+            return conn.QuerySingle<string>("SELECT status FROM orders WHERE id = @orderId", new { orderId });
+
+        }
     }
 }
