@@ -44,14 +44,14 @@ namespace OrderSystem
             ConsoleHelper.TextColor(ConsoleHelper.CenterText("Press ESC any time to cancel\n", Console.WindowWidth - 1), ConsoleColor.DarkGray);
 
             Address address = new Address();
-
+            long customerId = 0;
             while (true)
             {
                 Console.Write("Customer ID: ");
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
-                if (!long.TryParse(input, out long customerId))
+                if (!long.TryParse(input, out customerId))
                 {
                     ConsoleHelper.TextColor("⚠️ Invalid input. Please enter a valid customer ID.\n", ConsoleColor.Red);
                     continue;
@@ -62,8 +62,8 @@ namespace OrderSystem
                     continue;
                 }
                 var customerName = Customer.GetCustomerName(conn, customerId);
-                var customerType = Address.GetAddressType(conn, customerId);
-                ConsoleHelper.TextColor($"📢 Adding address for Customer: {customerName} (Available Address: {customerType})\n", ConsoleColor.DarkYellow);
+                var addressType = Address.GetAddressType(conn, customerId);
+                ConsoleHelper.TextColor($"📢 Adding address for Customer: {customerName} (Already has '{addressType}' address)\n", ConsoleColor.DarkYellow);
                 address.CustomerId = customerId;
                 break;
             }
@@ -74,17 +74,25 @@ namespace OrderSystem
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
-                if (input == "1")
+                if (input == "1" && !HasAddressType(conn, customerId, "Delivery"))
                 {
                     address.AddressType = "Delivery";
                     break;
                 }
-                else if (input == "2")
+                else if (input == "2" && !HasAddressType(conn, customerId, "Billing"))
                 {
                     address.AddressType = "Billing";
                     break;
                 }
-                ConsoleHelper.TextColor("⚠️ Invalid choice. Please enter 1 for Delivery or 2 for Billing.\n", ConsoleColor.Red);
+                else if (input == "1" || input == "2")
+                {
+                    string type = input == "1" ? "Delivery" : "Billing";
+                    ConsoleHelper.TextColor($"⚠️ Customer already has a {type} address. Please choose a different type.\n", ConsoleColor.Red);
+                }
+                else
+                {
+                    ConsoleHelper.TextColor("⚠️ Invalid choice. Please enter 1 for Delivery or 2 for Billing.\n", ConsoleColor.Red);
+                }
             }
 
             while (true)
@@ -225,9 +233,17 @@ namespace OrderSystem
             Console.ReadKey();
         }
 
-        public static string GetAddressType(SqliteConnection conn, long addressId)
+        public static string GetAddressType(SqliteConnection conn, long customerId)
         {
-            return conn.QuerySingle<string>("SELECT address_type FROM addresses WHERE id = @id", new { id = addressId }) ?? "Unknown";
+            var addressTypes = conn.Query<string>("SELECT address_type FROM addresses WHERE customer_id = @id", new { id = customerId }).ToList();
+            return addressTypes.Any() ? string.Join(", ", addressTypes) : "None";
+        }
+
+        public static bool HasAddressType(SqliteConnection conn, long customerId, string addressType)
+        {
+            var count = conn.ExecuteScalar<int>("SELECT COUNT(*) FROM addresses WHERE customer_id = @id AND address_type = @type",
+                new { id = customerId, type = addressType });
+            return count > 0;
         }
     }
 }

@@ -61,7 +61,8 @@ namespace OrderSystem
                     ConsoleHelper.TextColor($"⚠️ Order with ID (( {orderId} )) does not exist. Please enter a valid Order ID.\n", ConsoleColor.Red);
                     continue;
                 }
-                var customerName = Customer.GetCustomerName(conn, orderId);
+                var customerId = conn.QuerySingle<long>("SELECT customer_id FROM orders WHERE id = @orderId", new { orderId });
+                var customerName = Customer.GetCustomerName(conn, customerId);
                 ConsoleHelper.TextColor($"📢 Adding order item for customer: {customerName}\n", ConsoleColor.DarkYellow);
                 orderItem.OrderId = orderId;
                 break;
