@@ -40,7 +40,7 @@ namespace OrderSystem
             database.Execute(@"
                 CREATE TABLE IF NOT EXISTS products (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL UNIQUE CHECK(length(name)<=15),
+                name TEXT NOT NULL UNIQUE CHECK(length(name)<=30),
                 unit_price REAL NOT NULL,
                 stock INTEGER NOT NULL
                 );
@@ -61,7 +61,7 @@ namespace OrderSystem
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
 	            order_id INTEGER NOT NULL,
                 product_id INTEGER,
-                description TEXT CHECK(length(description)<=25),
+                description TEXT CHECK(length(description)<=30),
 	            quantity INTEGER NOT NULL,
                 unit_price REAL NOT NULL,
 	            FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,

@@ -61,6 +61,9 @@ namespace OrderSystem
                     ConsoleHelper.TextColor($"⚠️ Customer with ID (( {customerId} )) does not exist.\n", ConsoleColor.Red);
                     continue;
                 }
+                var customerName = Customer.GetCustomerName(conn, customerId);
+                var customerType = Address.GetAddressType(conn, customerId);
+                ConsoleHelper.TextColor($"📢 Adding address for Customer: {customerName} (Available Address: {customerType})\n", ConsoleColor.DarkYellow);
                 address.CustomerId = customerId;
                 break;
             }
@@ -220,6 +223,11 @@ namespace OrderSystem
             }
             Console.WriteLine("\nPress any key to continue...");
             Console.ReadKey();
+        }
+
+        public static string GetAddressType(SqliteConnection conn, long addressId)
+        {
+            return conn.QuerySingle<string>("SELECT address_type FROM addresses WHERE id = @id", new { id = addressId }) ?? "Unknown";
         }
     }
 }

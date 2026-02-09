@@ -310,5 +310,10 @@ namespace OrderSystem
         {
             return conn.QuerySingle<bool>("SELECT EXISTS(SELECT 1 FROM orders WHERE customer_id = @customerId)", new { customerId });
         }
+
+        public static string GetCustomerName(SqliteConnection conn, long customerId)
+        {
+            return conn.QuerySingle<string>("SELECT name FROM customers WHERE id = @id", new { id = customerId });
+        }
     }
 }
