@@ -121,7 +121,7 @@ namespace OrderSystem
                     sum(order_rows.quantity * order_rows.unit_price) AS total
                 FROM orders
                 JOIN customers ON orders.customer_id = customers.id
-                JOIN order_rows ON orders.id = order_rows.order_id
+                LEFT JOIN order_rows ON orders.id = order_rows.order_id
                 GROUP BY orders.id, customers.id
                 ORDER BY orders.id
             ");
@@ -174,7 +174,7 @@ namespace OrderSystem
                     ConsoleHelper.CenterText(customerName, 20),
                     ConsoleHelper.CenterText(orderDate.ToString("yyyy-MM-dd"), 30),
                     ConsoleHelper.CenterText(status, 20),
-                    ConsoleHelper.CenterText(order.total.ToString("C2", CultureInfo.CurrentCulture), 20)
+                    ConsoleHelper.CenterText(order.total != null ? ((decimal)order.total).ToString("C2", CultureInfo.CurrentCulture) : "", 20)
 
                 }, ConsoleColor.White, ConsoleColor.DarkGray);
                 Console.Write(padding);

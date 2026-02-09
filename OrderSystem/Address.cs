@@ -190,7 +190,7 @@ namespace OrderSystem
             if (!addresses.Any())
             {
                 Console.WriteLine();
-                ConsoleHelper.TextColor(ConsoleHelper.CenterText("No Addresses found.\n", Console.WindowWidth - 1), ConsoleColor.Yellow);
+                ConsoleHelper.TextColor(ConsoleHelper.CenterText("⚠️ No Addresses found.\n", Console.WindowWidth - 1), ConsoleColor.Yellow);
             }
 
             foreach (var address in addresses)

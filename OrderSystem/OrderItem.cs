@@ -164,7 +164,7 @@ namespace OrderSystem
                         if (productPrice.HasValue && productPrice.Value > 0)
                         {
                             orderItem.Price = productPrice.Value;
-                            ConsoleHelper.TextColor($"✓ Using product price: {productPrice.Value.ToString("C2", CultureInfo.CurrentCulture)}\n", ConsoleColor.Green);
+                            ConsoleHelper.TextColor($"✅ Using product price: {productPrice.Value.ToString("C2", CultureInfo.CurrentCulture)}\n", ConsoleColor.DarkYellow);
                             break;
                         }
                     }
@@ -207,7 +207,7 @@ namespace OrderSystem
             ConsoleHelper.TextColor(ConsoleHelper.CenterText("╚═════════════════════════════════════╝", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
             Console.WriteLine();
 
-            string separator = new string('-', 153);
+            string separator = new string('-', 147);
             int tableWidth = separator.Length;
             string padding = ConsoleHelper.GetTablePadding(tableWidth);
 
@@ -218,11 +218,11 @@ namespace OrderSystem
             {
                 ConsoleHelper.CenterText("Item ID", 7),
                 ConsoleHelper.CenterText("Order", 5),
-                ConsoleHelper.CenterText("Customer", 20),
+                ConsoleHelper.CenterText("Customer", 17),
                 ConsoleHelper.CenterText("Date", 10),
                 ConsoleHelper.CenterText("Status", 9),
                 ConsoleHelper.CenterText("Product", 15),
-                ConsoleHelper.CenterText("Description", 20),
+                ConsoleHelper.CenterText("Description", 17),
                 ConsoleHelper.CenterText("Quantity", 8),
                 ConsoleHelper.CenterText("Unit Price", 14),
                 ConsoleHelper.CenterText("Total Price", 14)
@@ -255,11 +255,11 @@ namespace OrderSystem
                 {
                     ConsoleHelper.CenterText(orderItemId.ToString(), 7),
                     ConsoleHelper.CenterText(orderId.ToString(), 5),
-                    ConsoleHelper.CenterText(customerName, 20),
+                    ConsoleHelper.CenterText(customerName, 17),
                     ConsoleHelper.CenterText(orderDate.ToString("yyyy-MM-dd"), 10),
                     ConsoleHelper.CenterText(status, 9),
                     ConsoleHelper.CenterText(productName, 15),
-                    ConsoleHelper.CenterText(description, 20),
+                    ConsoleHelper.CenterText(description, 17),
                     ConsoleHelper.CenterText(quantity.ToString(), 8),
                     ConsoleHelper.CenterText(unitPrice.ToString("C2", CultureInfo.CurrentCulture), 14),
                     ConsoleHelper.CenterText(totalPrice.ToString("C2", CultureInfo.CurrentCulture), 14)

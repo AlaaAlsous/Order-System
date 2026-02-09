@@ -90,35 +90,38 @@ namespace OrderSystem
                     LEFT JOIN products ON order_rows.product_id = products.id;
             ");
             string[] menu = {
-            ConsoleHelper.CenterText("┌───────── CUSTOMER ─────────┐", 33),
-            ConsoleHelper.CenterText("│ CREATE CUSTOMER            │", 33),
-            ConsoleHelper.CenterText("│ SHOW CUSTOMERS             │", 33),
-            ConsoleHelper.CenterText("│ DELETE CUSTOMER            │", 33),
-            ConsoleHelper.CenterText("│ ADD ADDRESS                │", 33),
-            ConsoleHelper.CenterText("│ SHOW ADDRESSES             │", 33),
-            ConsoleHelper.CenterText("└────────────────────────────┘", 33),
+            "┌───────── CUSTOMER ─────────┐",
+            "│ CREATE CUSTOMER            │",
+            "│ SHOW CUSTOMERS             │",
+            "│ DELETE CUSTOMER            │",
+            "│ ADD ADDRESS TO CUSTOMER    │",
+            "│ SHOW ADDRESSES             │",
+            "└────────────────────────────┘",
             "",
-            ConsoleHelper.CenterText("┌───────── PRODUCT ──────────┐", 33),
-            ConsoleHelper.CenterText("│ CREATE PRODUCT             │", 33),
-            ConsoleHelper.CenterText("│ SHOW PRODUCTS              │", 33),
-            ConsoleHelper.CenterText("│ DELETE PRODUCT             │", 33),
-            ConsoleHelper.CenterText("└────────────────────────────┘", 33),
+            "┌───────── PRODUCT ──────────┐",
+            "│ CREATE PRODUCT             │",
+            "│ SHOW PRODUCTS              │",
+            "│ DELETE PRODUCT             │",
+            "└────────────────────────────┘",
             "",
-            ConsoleHelper.CenterText("┌────────── ORDER ───────────┐", 33),
-            ConsoleHelper.CenterText("│ CREATE ORDER               │", 33),
-            ConsoleHelper.CenterText("│ SHOW ORDERS                │", 33),
-            ConsoleHelper.CenterText("│ UPDATE ORDER STATUS        │", 33),
-            ConsoleHelper.CenterText("│ DELETE                     │", 33),
-            ConsoleHelper.CenterText("└────────────────────────────┘", 33),
+            "┌────────── ORDER ───────────┐",
+            "│ CREATE ORDER               │",
+            "│ SHOW ORDERS                │",
+            "│ UPDATE ORDER STATUS        │",
+            "│ DELETE ORDER               │",
+            "└────────────────────────────┘",
             "",
-            ConsoleHelper.CenterText("┌──────── ORDER ITEM ────────┐", 33),
-            ConsoleHelper.CenterText("│ CREATE ORDER ITEM          │", 33),
-            ConsoleHelper.CenterText("│ SHOW ORDER ITEMS           │", 33),
-            ConsoleHelper.CenterText("│ DELETE ORDER ITEM          │", 33),
-            ConsoleHelper.CenterText("└────────────────────────────┘", 33),
+            "┌──────── ORDER ITEM ────────┐",
+            "│ CREATE ORDER ITEM          │",
+            "│ SHOW ORDER ITEMS           │",
+            "│ DELETE ORDER ITEM          │",
+            "└────────────────────────────┘",
             "",
-            ConsoleHelper.CenterText("EXIT", 33)
+            "┌────────────────────────────┐",
+            "│            EXIT            │",
+            "└────────────────────────────┘"
              };
+            const int menuWidth = 32;
             int position = 0;
 
             while (true)
@@ -133,6 +136,8 @@ namespace OrderSystem
                 Console.WriteLine();
                 ConsoleHelper.TextColor(ConsoleHelper.CenterText("Use ↑ and ↓ arrow keys to navigate and Enter to select\n", Console.WindowWidth - 1), ConsoleColor.DarkGray);
                 Console.CursorVisible = false;
+                string padding = ConsoleHelper.GetTablePadding(menuWidth);
+
                 for (int i = 0; i < menu.Length; i++)
                 {
                     if (menu[i] == "")
@@ -140,23 +145,25 @@ namespace OrderSystem
                         Console.WriteLine();
                         continue;
                     }
-                    
+
                     if (menu[i].Contains("┌─") || menu[i].Contains("└─"))
                     {
-                        ConsoleHelper.TextColor(ConsoleHelper.CenterText(menu[i], Console.WindowWidth - 1), ConsoleColor.White);
+                        ConsoleHelper.TextColor(padding + menu[i], ConsoleColor.White);
                         continue;
                     }
-                    
+
                     if (i == position)
                     {
+                        Console.Write(padding);
                         Console.ForegroundColor = ConsoleColor.Black;
                         Console.BackgroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine(ConsoleHelper.CenterText($"  {menu[i]}  ", Console.WindowWidth - 1));
+                        Console.Write(menu[i]);
                         Console.ResetColor();
+                        Console.WriteLine();
                     }
                     else
                     {
-                        ConsoleHelper.TextColor(ConsoleHelper.CenterText(menu[i], Console.WindowWidth - 1), ConsoleColor.DarkCyan);
+                        ConsoleHelper.TextColor(padding + menu[i], ConsoleColor.DarkCyan);
                     }
                 }
                 var Key = Console.ReadKey(true).Key;
@@ -200,7 +207,7 @@ namespace OrderSystem
                         case 23: OrderItem.ShowOrderItems(database); break;
                         case 24: OrderItem.DeleteOrderItem(database); break;
 
-                        case 27:
+                        case 28:
                             Console.Clear();
                             Console.WriteLine();
                             ConsoleHelper.TextColor(ConsoleHelper.CenterText("╔═══════════════════════════════════════════════╗", Console.WindowWidth - 1), ConsoleColor.DarkCyan);
