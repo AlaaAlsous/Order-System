@@ -223,13 +223,13 @@ namespace OrderSystem
             {
                 ConsoleHelper.CenterText("Item ID", 7),
                 ConsoleHelper.CenterText("Order", 5),
-                ConsoleHelper.CenterText("Customer", 17),
+                ConsoleHelper.CenterText("Customer", 15),
                 ConsoleHelper.CenterText("Date", 10),
                 ConsoleHelper.CenterText("Status", 9),
-                ConsoleHelper.CenterText("Product", 15),
-                ConsoleHelper.CenterText("Description", 17),
+                ConsoleHelper.CenterText("Product", 24),
+                ConsoleHelper.CenterText("Description", 12),
                 ConsoleHelper.CenterText("Quantity", 8),
-                ConsoleHelper.CenterText("Unit Price", 14),
+                ConsoleHelper.CenterText("Unit Price", 12),
                 ConsoleHelper.CenterText("Total Price", 14)
             }, ConsoleColor.Cyan, ConsoleColor.DarkGray);
             Console.Write(padding);
@@ -260,13 +260,13 @@ namespace OrderSystem
                 {
                     ConsoleHelper.CenterText(orderItemId.ToString(), 7),
                     ConsoleHelper.CenterText(orderId.ToString(), 5),
-                    ConsoleHelper.CenterText(customerName, 17),
+                    ConsoleHelper.CenterText(customerName, 15),
                     ConsoleHelper.CenterText(orderDate.ToString("yyyy-MM-dd"), 10),
                     ConsoleHelper.CenterText(status, 9),
-                    ConsoleHelper.CenterText(productName, 15),
-                    ConsoleHelper.CenterText(description, 17),
+                    ConsoleHelper.CenterText(productName, 24),
+                    ConsoleHelper.CenterText(description, 12),
                     ConsoleHelper.CenterText(quantity.ToString(), 8),
-                    ConsoleHelper.CenterText(unitPrice.ToString("C2", CultureInfo.CurrentCulture), 14),
+                    ConsoleHelper.CenterText(unitPrice.ToString("C2", CultureInfo.CurrentCulture), 12),
                     ConsoleHelper.CenterText(totalPrice.ToString("C2", CultureInfo.CurrentCulture), 14)
                 }, ConsoleColor.White, ConsoleColor.DarkGray);
                 Console.Write(padding);

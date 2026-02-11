@@ -188,7 +188,7 @@ namespace OrderSystem
             Console.WriteLine();
 
             string separator = new string('-', 88);
-            int tableWidth = separator.Length + 4;
+            int tableWidth = separator.Length;
             string padding = ConsoleHelper.GetTablePadding(tableWidth);
 
             Console.Write(padding);

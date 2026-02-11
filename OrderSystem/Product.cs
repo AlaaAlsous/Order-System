@@ -48,9 +48,9 @@ namespace OrderSystem
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
-                if (input.Length < 2 || input.Length > 20)
+                if (input.Length < 2 || input.Length > 25)
                 {
-                    ConsoleHelper.TextColor("⚠️ Name cannot be empty. Please enter a valid name (between 2 and 20 characters).\n", ConsoleColor.Red);
+                    ConsoleHelper.TextColor("⚠️ Name cannot be empty. Please enter a valid name (between 2 and 25 characters).\n", ConsoleColor.Red);
                     continue;
                 }
                 if (CheckName(conn, input))
@@ -109,7 +109,7 @@ namespace OrderSystem
             Console.WriteLine();
 
             string separator = new string('-', 88);
-            int tableWidth = separator.Length + 4;
+            int tableWidth = separator.Length;
             string padding = ConsoleHelper.GetTablePadding(tableWidth);
 
             Console.Write(padding);
