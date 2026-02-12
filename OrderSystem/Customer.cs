@@ -48,6 +48,7 @@ namespace OrderSystem
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
+                // Table: Name col ≈20; here max 20 to fit.
                 if (input.Length >= 3 && input.Length <= 20)
                 {
                     customer.Name = input; break;

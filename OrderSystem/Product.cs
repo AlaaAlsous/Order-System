@@ -48,6 +48,7 @@ namespace OrderSystem
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
+                // Table: Name col ≈30; here max 25 to fit.
                 if (input.Length < 2 || input.Length > 25)
                 {
                     ConsoleHelper.TextColor("⚠️ Name cannot be empty. Please enter a valid name (between 2 and 25 characters).\n", ConsoleColor.Red);

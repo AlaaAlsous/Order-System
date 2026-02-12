@@ -96,6 +96,11 @@ namespace OrderSystem
                 {
                     ConsoleHelper.TextColor($"📢 Available stock: {availableStock.Value}", ConsoleColor.DarkYellow);
                 }
+                if (availableStock.HasValue && availableStock.Value <= 0)
+                {
+                    ConsoleHelper.TextColor("⚠️ This product is out of stock. Please choose a different product or leave empty to add a description.\n", ConsoleColor.Yellow);
+                    continue;
+                }
                 var productPrice = GetProductPrice(conn, productId);
                 if (productPrice.HasValue)
                 {
@@ -110,6 +115,7 @@ namespace OrderSystem
                 var input = ConsoleHelper.ReadLineWithEscape();
                 if (input == null) return;
                 input = input.Trim();
+                // Table: Desc col is ≈30; here max 25 to fit.
                 if (input.Length <= 25)
                 {
                     orderItem.Description = input;
@@ -139,11 +145,6 @@ namespace OrderSystem
                 if (quantity <= 0)
                 {
                     ConsoleHelper.TextColor("⚠️ Quantity must be greater than 0.\n", ConsoleColor.Red);
-                    continue;
-                }
-                if (availableStock.HasValue && availableStock.Value <= 0)
-                {
-                    ConsoleHelper.TextColor($"⚠️ Warning: Product with ID (( {orderItem.ProductId} )) is out of stock.\n", ConsoleColor.Yellow);
                     continue;
                 }
                 if (availableStock.HasValue && quantity > availableStock.Value)
@@ -190,7 +191,6 @@ namespace OrderSystem
                 {
                     UpdateProductStock(conn, orderItem.ProductId.Value, orderItem.Quantity);
                 }
-
                 Console.WriteLine();
                 ConsoleHelper.TextColor($"✅ Order item (( {orderItem.Id} )) added successfully\n", ConsoleColor.DarkGreen);
             }
@@ -355,9 +355,9 @@ namespace OrderSystem
             return conn.QuerySingle<decimal?>(@"SELECT unit_price FROM products WHERE id = @productId;", new { productId });
         }
 
-        public static void UpdateProductStock(SqliteConnection conn, long productId, long quantity)
+        public static int UpdateProductStock(SqliteConnection conn, long productId, long quantity)
         {
-            conn.Execute(@"UPDATE products SET stock = stock - @quantity WHERE id = @productId;", new { productId, quantity });
+            return conn.Execute(@"UPDATE products SET stock = stock - @quantity WHERE id = @productId AND stock >= @quantity;", new { productId, quantity });
         }
 
         public static bool OrderItemExists(SqliteConnection conn, long orderItemId)
