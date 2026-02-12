@@ -4,7 +4,8 @@
 ![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)
 ![Dapper](https://img.shields.io/badge/Dapper-ORM-7A5C61)
-![Console](https://img.shields.io/badge/Platform-Console-blue)
+![Type](https://img.shields.io/badge/Type-Console%20App-darkcyan)
+![License](https://img.shields.io/badge/License-MIT-green)
 
 ## Beskrivning
 
@@ -170,4 +171,8 @@ dotnet build OrderSystem/OrderSystem.csproj
 
 ## Utvecklare
 
-Alaa Alsous
+**Alaa Alsous**  
+
+Språk: C#  
+Plattform: .NET 10   
+Verktyg: Visual Studio  
