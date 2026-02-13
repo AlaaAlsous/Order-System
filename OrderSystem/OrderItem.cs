@@ -70,66 +70,69 @@ namespace OrderSystem
             long? availableStock = null;
             while (true)
             {
-                Console.Write("Product ID [Leave empty to skip]: ");
-                var input = ConsoleHelper.ReadLineWithEscape();
-                if (input == null) return;
-                input = input.Trim();
-                if (string.IsNullOrEmpty(input))
+                while (true)
                 {
-                    orderItem.ProductId = null;
+                    Console.Write("Product ID [Leave empty to skip]: ");
+                    var input = ConsoleHelper.ReadLineWithEscape();
+                    if (input == null) return;
+                    input = input.Trim();
+                    if (string.IsNullOrEmpty(input))
+                    {
+                        orderItem.ProductId = null;
+                        break;
+                    }
+                    if (!long.TryParse(input, out long productId))
+                    {
+                        ConsoleHelper.TextColor("⚠️ Invalid input. Please enter a valid number.\n", ConsoleColor.Red);
+                        continue;
+                    }
+                    if (!Product.ProductExists(conn, productId))
+                    {
+                        ConsoleHelper.TextColor($"⚠️ Product with ID (( {productId} )) does not exist. Please enter a valid Product ID.\n", ConsoleColor.Red);
+                        continue;
+                    }
+                    var productName = Product.GetProductName(conn, productId);
+                    ConsoleHelper.TextColor($"📢 Selected product: {productName}", ConsoleColor.DarkYellow);
+                    availableStock = GetProductStock(conn, productId);
+                    if (availableStock.HasValue)
+                    {
+                        ConsoleHelper.TextColor($"📢 Available stock: {availableStock.Value}", ConsoleColor.DarkYellow);
+                    }
+                    if (availableStock.HasValue && availableStock.Value <= 0)
+                    {
+                        ConsoleHelper.TextColor("⚠️ This product is out of stock. Please choose a different product or leave empty to add a description.\n", ConsoleColor.Yellow);
+                        continue;
+                    }
+                    var productPrice = GetProductPrice(conn, productId);
+                    if (productPrice.HasValue)
+                    {
+                        ConsoleHelper.TextColor($"📢 Product unit price: {productPrice.Value.ToString("C2", CultureInfo.CurrentCulture)}", ConsoleColor.DarkYellow);
+                    }
+                    orderItem.ProductId = productId;
                     break;
                 }
-                if (!long.TryParse(input, out long productId))
+                while (true)
                 {
-                    ConsoleHelper.TextColor("⚠️ Invalid input. Please enter a valid number.\n", ConsoleColor.Red);
-                    continue;
+                    Console.Write("Description [Leave empty to skip]: ");
+                    var input = ConsoleHelper.ReadLineWithEscape();
+                    if (input == null) return;
+                    input = input.Trim();
+                    // Table: Desc col is ≈30; here max 25 to fit.
+                    if (input.Length <= 25)
+                    {
+                        orderItem.Description = input;
+                        break;
+                    }
+                    ConsoleHelper.TextColor("⚠️ Invalid input. Description cannot exceed 25 characters.\n", ConsoleColor.Red);
+                        continue;
                 }
-                if (!Product.ProductExists(conn, productId))
+                if (!orderItem.ProductId.HasValue && string.IsNullOrEmpty(orderItem.Description))
                 {
-                    ConsoleHelper.TextColor($"⚠️ Product with ID (( {productId} )) does not exist. Please enter a valid Product ID.\n", ConsoleColor.Red);
-                    continue;
-                }
-                var productName = Product.GetProductName(conn, productId);
-                ConsoleHelper.TextColor($"📢 Selected product: {productName}", ConsoleColor.DarkYellow);
-                availableStock = GetProductStock(conn, productId);
-                if (availableStock.HasValue)
-                {
-                    ConsoleHelper.TextColor($"📢 Available stock: {availableStock.Value}", ConsoleColor.DarkYellow);
-                }
-                if (availableStock.HasValue && availableStock.Value <= 0)
-                {
-                    ConsoleHelper.TextColor("⚠️ This product is out of stock. Please choose a different product or leave empty to add a description.\n", ConsoleColor.Yellow);
-                    continue;
-                }
-                var productPrice = GetProductPrice(conn, productId);
-                if (productPrice.HasValue)
-                {
-                    ConsoleHelper.TextColor($"📢 Product unit price: {productPrice.Value.ToString("C2", CultureInfo.CurrentCulture)}", ConsoleColor.DarkYellow);
-                }
-                orderItem.ProductId = productId;
-                break;
-            }
-            while (true)
-            {
-                Console.Write("Description [Leave empty to skip]: ");
-                var input = ConsoleHelper.ReadLineWithEscape();
-                if (input == null) return;
-                input = input.Trim();
-                // Table: Desc col is ≈30; here max 25 to fit.
-                if (input.Length <= 25)
-                {
-                    orderItem.Description = input;
-                    break;
-                }
-                ConsoleHelper.TextColor("⚠️ Invalid input. Description cannot exceed 25 characters.\n", ConsoleColor.Red);
-            }
+                    ConsoleHelper.TextColor("⚠️ You must provide either a Product ID or a Description (or both).\n", ConsoleColor.Red);
 
-            if (!orderItem.ProductId.HasValue && string.IsNullOrEmpty(orderItem.Description))
-            {
-                ConsoleHelper.TextColor("⚠️ You must provide either a Product ID or a Description (or both).\n", ConsoleColor.Red);
-                Console.WriteLine("Press any key to continue...");
-                Console.ReadKey();
-                return;
+                    continue;
+                }
+                break;
             }
             while (true)
             {
@@ -147,7 +150,7 @@ namespace OrderSystem
                     ConsoleHelper.TextColor("⚠️ Quantity must be greater than 0.\n", ConsoleColor.Red);
                     continue;
                 }
-                if (availableStock.HasValue && quantity > availableStock.Value)
+                if (availableStock.HasValue && quantity > availableStock.Value && availableStock.Value > 0)
                 {
                     ConsoleHelper.TextColor($"⚠️ Warning: Insufficient stock for Product ID (( {orderItem.ProductId} )). Available: {availableStock.Value}, Required: {quantity}.\n", ConsoleColor.Yellow);
                     continue;
@@ -174,6 +177,8 @@ namespace OrderSystem
                             break;
                         }
                     }
+                    ConsoleHelper.TextColor("⚠️ No product price available. Please enter a price manually.\n", ConsoleColor.Red);
+                    continue;
                 }
                 if (!decimal.TryParse(input, out decimal price) || price <= 0)
                 {
@@ -189,7 +194,11 @@ namespace OrderSystem
             {
                 if (orderItem.ProductId.HasValue)
                 {
-                    UpdateProductStock(conn, orderItem.ProductId.Value, orderItem.Quantity);
+                    int rowsAffected = UpdateProductStock(conn, orderItem.ProductId.Value, orderItem.Quantity);
+                    if (rowsAffected == 0)
+                    {
+                        ConsoleHelper.TextColor("⚠️ Warning: Stock update failed. Insufficient stock or product was modified.\n", ConsoleColor.Yellow);
+                    }
                 }
                 Console.WriteLine();
                 ConsoleHelper.TextColor($"✅ Order item (( {orderItem.Id} )) added successfully\n", ConsoleColor.DarkGreen);
@@ -317,7 +326,10 @@ namespace OrderSystem
                     ConsoleHelper.TextColor($"⚠️ Order Item with ID (( {orderItemId} )) does not exist.\n", ConsoleColor.Red);
                     continue;
                 }
-                var orderId = conn.QuerySingle<long>("SELECT order_id FROM order_rows WHERE id = @orderItemId", new { orderItemId });
+                var orderItemData = conn.QuerySingle("SELECT order_id, product_id, quantity FROM order_rows WHERE id = @orderItemId", new { orderItemId });
+                long orderId = orderItemData.order_id;
+                long? productId = orderItemData.product_id;
+                long quantity = orderItemData.quantity;
                 var customerId = conn.QuerySingle<long>("SELECT customer_id FROM orders WHERE id = @orderId", new { orderId });
                 var customerName = Customer.GetCustomerName(conn, customerId);
                 ConsoleHelper.TextColor($"⚠️ Are you sure you want to delete order item for customer (( {customerName} ))? (y/n):", ConsoleColor.DarkYellow);
@@ -332,6 +344,10 @@ namespace OrderSystem
                 OrderItem orderItem = new OrderItem { Id = orderItemId };
                 if (orderItem.Delete(conn))
                 {
+                    if (productId.HasValue)
+                    {
+                        RestoreProductStock(conn, productId.Value, quantity);
+                    }
                     Console.WriteLine();
                     ConsoleHelper.TextColor($"✅ Order Item (( {orderItemId} )) deleted successfully\n", ConsoleColor.DarkGreen);
                 }
@@ -358,6 +374,11 @@ namespace OrderSystem
         public static int UpdateProductStock(SqliteConnection conn, long productId, long quantity)
         {
             return conn.Execute(@"UPDATE products SET stock = stock - @quantity WHERE id = @productId AND stock >= @quantity;", new { productId, quantity });
+        }
+
+        public static int RestoreProductStock(SqliteConnection conn, long productId, long quantity)
+        {
+            return conn.Execute(@"UPDATE products SET stock = stock + @quantity WHERE id = @productId;", new { productId, quantity });
         }
 
         public static bool OrderItemExists(SqliteConnection conn, long orderItemId)
